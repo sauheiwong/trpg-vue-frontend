@@ -1,6 +1,6 @@
 <template>
   <div class="chat-message" :class="messageClass">
-    <p>{{ message.text }}</p>
+    <p>{{ message.content }}</p>
   </div>
 </template>
 
@@ -15,7 +15,7 @@ export default {
   },
   computed: {
     messageClass() {
-      return `message-${this.message.sender}`;
+      return `message-${this.message.role}`;
     },
   },
 };
