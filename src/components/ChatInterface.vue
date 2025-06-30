@@ -22,13 +22,14 @@ export default {
   components: {
     ChatMessage,
   },
+  props: {
+    messages: {
+      type: Array,
+      required: true
+    }
+  },
   data() {
     return {
-      messages: [
-        { id: 1, content: '你好！我是 AI 模型。', role: 'assistant' },
-        { id: 2, content: '嗨！我是一個問題。', role: 'user' },
-        { id: 3, content: '系統訊息：對話已開始。', role: 'system' },
-      ].reverse(),
       userMessage: "",
     };
   },

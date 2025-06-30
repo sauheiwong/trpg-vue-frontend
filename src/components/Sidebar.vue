@@ -6,8 +6,7 @@
     <div v-if="!isCollapsed" class="sidebar-content">
       <h3>聊天歷史</h3>
       <ul>
-        <li>對話 1</li>
-        <li>對話 2</li>
+        <li v-for="conversation in conversations" :key="conversation.id" @click="selectConversation(conversation.id)">{{ conversation.title }}</li>
       </ul>
     </div>
   </div>
@@ -26,7 +25,19 @@ export default {
     toggleSidebar() {
       this.$emit('toggle');
     },
+    selectConversation(chatId){
+      console.log("select conversation id is: ", chatId)
+      this.$emit("select-chat", chatId)
+    }
   },
+  data(){
+    return {
+      conversations: [
+        {id: "chat-1", title: "Conversation 1"},
+        {id: "chat-2", title: "Conversation 2"},
+      ]
+    }
+  }
 };
 </script>
 
