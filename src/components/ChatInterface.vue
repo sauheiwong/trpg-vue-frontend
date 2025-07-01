@@ -34,48 +34,12 @@ export default {
     };
   },
   methods: {
-    async sendMessage(){
-      this.messages.push({
-        id: this.messages.length,
-        content: this.userMessage,
-        role: "user"
-      })
-      // fetch("http://localhost:4000/test/chat/685da04ea95ae213d4348b0b", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json"
-      //   },
-      //   body: JSON.stringify({ message: this.userMessage })
-      // })
-      // .then(response => {
-      //   if(!response.ok){
-      //     return response.json().then(errorData => {
-      //       throw new Error(`HTTP Error. status: ${response.status}, message: ${errorData.message || 
-      //       "server error"}`)
-      //     })
-      //   }
-      //   return response.json()
-      // })
-      // .then(data => {
-      //   this.userMessage = ""
-      //   this.messages.push({
-      //     id: this.messages.length,
-      //     content: data.message,
-      //     role: "assistant"
-      //   })
-      // })
-      // .catch(error => {
-      //   console.error("fetch fail: ", error);
-      // })
-      const data = {
-        message: "test"
+    sendMessage(){
+      if(!this.userMessage.trim()){
+        return;
       }
+      this.$emit("send-message", this.userMessage)
       this.userMessage = ""
-      this.messages.push({
-        id: this.messages.length,
-        content: data.message,
-        role: "assistant"
-      })
     }
   }
 };

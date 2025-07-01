@@ -8,6 +8,7 @@
       <ul>
         <li v-for="conversation in conversations" :key="conversation.id" @click="selectConversation(conversation.id)">{{ conversation.title }}</li>
       </ul>
+      <button @click="logout" class="logout-btn">登出</button>
     </div>
   </div>
 </template>
@@ -28,6 +29,9 @@ export default {
     selectConversation(chatId){
       console.log("select conversation id is: ", chatId)
       this.$emit("select-chat", chatId)
+    },
+    logout(){
+      this.$emit("logout");
     }
   },
   data(){
@@ -42,6 +46,23 @@ export default {
 </script>
 
 <style scoped>
+
+.logout-btn {
+  margin-top: auto; /* 將按鈕推到最下方 */
+  padding: 10px;
+  width: 100%;
+  background-color: #f44336; /* 紅色 */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+}
+
 .sidebar {
   width: 250px;
   background-color: black;

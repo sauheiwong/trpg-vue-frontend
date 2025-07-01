@@ -8,6 +8,7 @@
   --border-radius: 20px;
   --transition: 0.5s ease-in-out;
   --fast-transition: 0.25s ease-in-out;
+  --input-background: gray;
 }
 
 body {
