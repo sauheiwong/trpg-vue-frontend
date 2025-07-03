@@ -8,8 +8,8 @@
       />
     </div>
     <div class="input-area">
-      <input type="text" v-model="userMessage" placeholder="在這裡輸入訊息..." />
-      <button @click="sendMessage">發送</button>
+      <input type="text" v-model="userMessage" placeholder="Enter your message" />
+      <button @click="sendMessage">Send</button>
     </div>
   </div>
 </template>

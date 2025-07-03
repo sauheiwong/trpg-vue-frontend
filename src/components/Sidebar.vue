@@ -4,11 +4,12 @@
       {{ isCollapsed ? '›' : '‹' }}
     </button>
     <div v-if="!isCollapsed" class="sidebar-content">
-      <h3>聊天歷史</h3>
+      <router-link to="/" class="home-link">Home</router-link>
+      <h3>Chat History</h3>
       <ul>
         <li v-for="conversation in conversations" :key="conversation.id" @click="selectConversation(conversation.id)">{{ conversation.title }}</li>
       </ul>
-      <button @click="logout" class="logout-btn">登出</button>
+      <button @click="logout" class="logout-btn">Logout</button>
     </div>
   </div>
 </template>
@@ -46,6 +47,11 @@ export default {
 </script>
 
 <style scoped>
+
+.home-link{
+  color: var(--text-color);
+  font-size: 40px;
+}
 
 .logout-btn {
   margin-top: auto; /* 將按鈕推到最下方 */

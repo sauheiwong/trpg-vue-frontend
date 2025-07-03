@@ -68,7 +68,7 @@ form {
   display: flex;
   flex-direction: column;
   width: 50%;
-  height: 40%;
+  /* height: 40%; */
   gap: 15px;
   padding: 40px;
   border: 1px solid #ccc;

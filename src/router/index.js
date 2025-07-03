@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import LoginView from '../views/loginView.vue';
 import ChatView from '../views/chatView.vue';
+import HomeView from '../views/homeView.vue';
 
 const routes = [
   {
@@ -9,9 +10,15 @@ const routes = [
     component: LoginView,
   },
   {
-    path: '/',
+    path: '/chat',
     name: 'Chat',
     component: ChatView,
+    meta: { requiresAuth: true }, // 標記此路由需要登入
+  },
+  {
+    path: '/',
+    name: 'Home',
+    component: HomeView,
     meta: { requiresAuth: true }, // 標記此路由需要登入
   },
   // 捕獲所有未匹配的路由並重定向到首頁

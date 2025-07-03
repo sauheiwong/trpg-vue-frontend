@@ -25,9 +25,9 @@ export default {
     return {
       isSidebarCollapsed: false,
       messages: [
-        { id: 1, content: '你好！我是 AI 模型。', role: 'assistant' },
-        { id: 2, content: '嗨！我是一個問題。', role: 'user' },
-        { id: 3, content: '系統訊息：對話已開始。', role: 'system' },
+        { id: 1, content: 'Hello, I am AI chat message。', role: 'assistant' },
+        { id: 2, content: 'I am a message from user', role: 'user' },
+        { id: 3, content: 'system message: chat start', role: 'system' },
       ]
     };
   },
@@ -41,9 +41,9 @@ export default {
       // fake data
       const fakeData = {
         "messages": [
-          { id: Date.now(), content: '系統訊息：新對話已開始。', role: 'system' },
-          { id: Date.now() + 1, content: '嗨！我是一個新問題。', role: 'user' },
-          { id: Date.now() + 2, content: '你好！我是 AI 模型。', role: 'assistant' },
+          { id: Date.now(), content: 'system message: a new chat start', role: 'system' },
+          { id: Date.now() + 1, content: 'I am a new message from user ', role: 'user' },
+          { id: Date.now() + 2, content: 'Hello, I am new AI chat message。', role: 'assistant' },
         ]
       }
       this.messages = fakeData.messages
@@ -63,7 +63,7 @@ export default {
 
       await new Promise(res => setTimeout(res, 500)) // 模擬網路延遲 
       const aiResponse = {
-        message: `這是對「${userMessage}」的 AI 回覆。`
+        message: `It is the response of "${userMessage}".`
       }
 
       this.messages[this.messages.length - 1].content = aiResponse.message
