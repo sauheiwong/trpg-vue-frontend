@@ -45,7 +45,7 @@ export default {
 
         this.$router.push("/")
       } catch (err){
-        this. error = err.response?.data?.message || "Login fail, please check your username and password"
+        this.error = err.response?.data?.message || "Login fail, please check your username and password"
       } finally {
         this.isLoading = false;
       }

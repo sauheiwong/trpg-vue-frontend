@@ -7,7 +7,7 @@
     @logout="logout"
     />
     <div class="main-content">
-      <ChatInterface :messages="messages" @send-message="sendMessage"/>
+      <ChatInterface :title="title" :messages="messages" @send-message="sendMessage"/>
     </div>
   </div>
 </template>
@@ -15,6 +15,7 @@
 <script>
 import Sidebar from '../components/Sidebar.vue';
 import ChatInterface from '../components/ChatInterface.vue';
+import apiClient from '../api';
 
 export default {
   components: {
@@ -24,19 +25,18 @@ export default {
   data() {
     return {
       isSidebarCollapsed: false,
-      messages: [
-        { id: 1, content: 'Hello, I am AI chat message。', role: 'assistant' },
-        { id: 2, content: 'I am a message from user', role: 'user' },
-        { id: 3, content: 'system message: chat start', role: 'system' },
-      ]
+      title: "New Conversation",
+      messages: [],
+      isNewConversation: true,
+      conversationId: "",
     };
   },
   methods: {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
-    async getConversation(chatId){
-      console.log("get conversation id is: ", chatId);
+    async getConversation(conversationId){
+      console.log("get conversation id is: ", conversationId);
       // should be fetching data
       // fake data
       const fakeData = {
@@ -48,6 +48,7 @@ export default {
       }
       this.messages = fakeData.messages
     },
+    // test message: 你知道初音未來嗎?
     async sendMessage(userMessage){
       this.messages.push({
         id: Date.now(),
@@ -61,12 +62,27 @@ export default {
         role: "assistant",
       })
 
-      await new Promise(res => setTimeout(res, 500)) // 模擬網路延遲 
-      const aiResponse = {
-        message: `It is the response of "${userMessage}".`
-      }
+      try{ 
+        console.log("fetch start");
 
-      this.messages[this.messages.length - 1].content = aiResponse.message
+        let response;
+
+        if (this.isNewConversation){
+          response = await apiClient.post(`/test/chat/`, {
+          message: userMessage,
+        });
+          this.conversationId = response.data.conversationId
+        } else {
+          response = await apiClient.post(`/test/chat/${this.conversationId}`, {
+          message: userMessage,
+        });
+        }
+
+        this.messages[this.messages.length - 1].content = response.data.modelMessage;
+
+      } catch (err){
+        this.messages[this.messages.length - 1].content = err.response?.data?.message || "fetch fail or server error"
+      }
     },
     logout() {
         localStorage.removeItem("user-token");

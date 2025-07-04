@@ -25,9 +25,9 @@ export default {
     data(){
         return {
             options: [
-                {id: "option-1", title: "Chat", to: "/chat"},
-                {id: "option-2", title: "Setting", to: "/"},
-                {id: "option-3", title: "Game", to: "/"},
+                {id: "option-1", title: "New Chat", to: "/chat"},
+                {id: "option-2", title: "Chat History", to: "/"},
+                {id: "option-3", title: "Setting", to: "/"},
             ]
         }
     }
