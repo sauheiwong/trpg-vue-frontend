@@ -81,7 +81,7 @@ export default {
         return;
       }
 
-      // this.$emit("update-title", newTitle);
+      this.$emit("update-title", newTitle);
     }
   }
 };

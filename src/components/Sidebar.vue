@@ -5,9 +5,10 @@
     </button>
     <div v-if="!isCollapsed" class="sidebar-content">
       <router-link to="/" class="home-link">Home</router-link>
+      <button @click="newChat" class="new-chat-btn">+ New Chat</button>
       <h3>Chat History</h3>
       <ul>
-        <li v-for="conversation in conversations" :key="conversation.id" @click="selectConversation(conversation.id)">{{ conversation.title }}</li>
+        <li v-for="conversation in conversations" :key="conversation.id" @click="selectConversation(conversation._id)">{{ conversation.title }}</li>
       </ul>
       <button @click="logout" class="logout-btn">Logout</button>
     </div>
@@ -22,6 +23,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    conversations: {
+      type: Array,
+      required: true,
+    }
   },
   methods: {
     toggleSidebar() {
@@ -31,22 +36,38 @@ export default {
       console.log("select conversation id is: ", chatId)
       this.$emit("select-chat", chatId)
     },
+    newChat(){
+      this.$emit("new-chat");
+    },
     logout(){
       this.$emit("logout");
     }
   },
   data(){
     return {
-      conversations: [
-        {id: "chat-1", title: "Conversation 1"},
-        {id: "chat-2", title: "Conversation 2"},
-      ]
     }
   }
 };
 </script>
 
 <style scoped>
+
+.new-chat-btn{
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: var(--highlight2-color, #444);
+  color: var(--text-color);
+  border: 1px solid var(--highlight1-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: var(--fast-transition);
+}
+
+.new-chat-btn:hover {
+  background-color: var(--highlight1-color);
+}
 
 .home-link{
   color: var(--text-color);

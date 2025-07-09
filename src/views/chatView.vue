@@ -1,13 +1,20 @@
 <template>
   <div id="chat-layout">
     <Sidebar 
-    :is-collapsed="isSidebarCollapsed" 
-    @toggle="toggleSidebar" 
+    :is-collapsed="isSidebarCollapsed"
+    :conversations="conversations"
+    @toggle="toggleSidebar"
+    @new-chat="newChat" 
     @select-chat="getConversation" 
     @logout="logout"
     />
     <div class="main-content">
-      <ChatInterface :title="title" :messages="messages" @send-message="sendMessage"/>
+      <ChatInterface 
+      :title="title" 
+      :messages="messages" 
+      @send-message="sendMessage"
+      @update-title="updateTitle"
+      />
     </div>
   </div>
 </template>
@@ -29,27 +36,51 @@ export default {
       messages: [],
       isNewConversation: true,
       conversationId: "",
+      conversations: [],
     };
+  },
+  created() {
+    this.fetchConversations();
   },
   methods: {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
+    newChat() {
+      this.title = "New chat";
+      this.messages = [];
+      this.isNewConversation = true;
+      this.conversationId = `new-${Date.now()}`
+    },
+    async fetchConversations() {
+      try{
+        console.log("fetch conversation start");
+        const response = await apiClient.get("/chat");
+        console.log("response is: ", response);
+        this.conversations = response.data.conversations;
+      } catch (err){
+        console.error("fetch conversation error is: ", err)
+        this.conversations = [{title: "error", updatedAt: Date.now()}]
+      }
+    },
     async getConversation(conversationId){
       console.log("get conversation id is: ", conversationId);
-      // should be fetching data
-      // fake data
-      const fakeData = {
-        "messages": [
-          { id: Date.now(), content: 'system message: a new chat start', role: 'system' },
-          { id: Date.now() + 1, content: 'I am a new message from user ', role: 'user' },
-          { id: Date.now() + 2, content: 'Hello, I am new AI chat message。', role: 'assistant' },
-        ]
+      try{
+        const response = await apiClient.get(`/chat/${conversationId}`);
+        console.log("response.data is: ", response.data);
+        this.title = response.data.title;
+        this.messages = response.data.messages;
+        this.conversationId = conversationId;
+        this.isNewConversation = false;
+      } catch (err){
+        this.title = `Error⚠️: ${err}`;
+        this.messages = [];
       }
-      this.messages = fakeData.messages
     },
-    // test message: 你知道初音未來嗎?
     async sendMessage(userMessage){
+      if (this.isNewConversation){
+        this.messages = []
+      }
       this.messages.push({
         id: Date.now(),
         content: userMessage,
@@ -71,7 +102,9 @@ export default {
           response = await apiClient.post(`/test/chat/`, {
           message: userMessage,
         });
-          this.conversationId = response.data.conversationId
+          this.conversationId = response.data.conversationId;
+          this.isNewConversation = false;
+          await this.fetchConversations();
         } else {
           response = await apiClient.post(`/test/chat/${this.conversationId}`, {
           message: userMessage,
@@ -84,11 +117,24 @@ export default {
         this.messages[this.messages.length - 1].content = err.response?.data?.message || "fetch fail or server error"
       }
     },
+    async updateTitle(newTitle) {
+      if (this.isNewConversation) return;
+      try{
+        console.log("conversation id is: ", this.conversationId)
+        await apiClient.put(`/chat/${this.conversationId}`, {title: newTitle});
+        const conversationInList = this.conversations.find(c => c._id === this.conversationId)
+        if (conversationInList){
+          conversationInList.title = newTitle
+        }
+      } catch (err){
+        this.title = `Error⚠️: ${err}`;
+      }
+    },
     logout() {
         localStorage.removeItem("user-token");
         this.$router.push("/login")
     }
-  },
+  }
 };
 </script>
 
