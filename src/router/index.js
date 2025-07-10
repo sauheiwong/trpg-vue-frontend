@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginView from '../views/loginView.vue';
 import ChatView from '../views/chatView.vue';
 import HomeView from '../views/homeView.vue';
+import SettingView from '@/views/settingView.vue';
 
 const routes = [
   {
@@ -19,6 +20,12 @@ const routes = [
     path: '/',
     name: 'Home',
     component: HomeView,
+    meta: { requiresAuth: true }, // 標記此路由需要登入
+  },
+  {
+    path: '/setting',
+    name: 'Setting',
+    component: SettingView,
     meta: { requiresAuth: true }, // 標記此路由需要登入
   },
   // 捕獲所有未匹配的路由並重定向到首頁

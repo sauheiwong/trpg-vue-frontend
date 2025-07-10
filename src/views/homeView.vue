@@ -27,7 +27,7 @@ export default {
             options: [
                 {id: "option-1", title: "New Chat", to: "/chat"},
                 {id: "option-2", title: "Chat History", to: "/"},
-                {id: "option-3", title: "Setting", to: "/"},
+                {id: "option-3", title: "Setting", to: "/setting"},
             ]
         }
     }
