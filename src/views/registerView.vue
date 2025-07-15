@@ -1,17 +1,20 @@
 <template>
-  <div class="login-container">
-      <form @submit.prevent="login">
-        <h2 class="title">Login</h2>
+  <div class="register-container">
+      <form @submit.prevent="register">
+        <h2 class="title">Register</h2>
       <div class="form-group">
-        <label for="username">Username:</label>
+        <label for="username">Email:</label>
         <input type="text" id="username" v-model="username" required>
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
         <input type="password" id="password" v-model="password" required>
       </div>
-      <button type="submit" :disabled="isLoading" class="btn">{{ isLoading ? "Logging in..." : "Login" }}</button>
-      <router-link to="/register" class="btn">Register</router-link>
+      <div class="form-group">
+        <label for="confirm password">Confirm Password:</label>
+        <input type="password" id="confirm password" v-model="confirmPassword" required>
+      </div>
+      <button type="submit" :disabled="isLoading">{{ isLoading ? "Loading..." : "register" }}</button>
       <p v-if="error" class="error-message">{{ error }}</p>
     </form>
   </div>
@@ -21,31 +24,40 @@
 import apiClient from '../api';
 
 export default {
-  name: 'LoginView',
+  name: 'RegisterView',
   data() {
     return {
       username: '',
       password: '',
+      confirmPassword: '',
       error: '',
       isLoading: false,
     };
   },
   methods: {
-    async login() {
+    async register() {
       this.error = "";
       this.isLoading = true;
+
+      console.log(`username is ${this.username}, password is ${this.password}, confirm password is ${this.confirmPassword}`)
+
+      if (this.password !== this.confirmPassword){
+        this.error = 'password not match. Please check it.'
+        this.password = '';
+        this.confirmPassword = '';
+        this.isLoading = false;
+        return;
+      }
+
       try{
-        const response = await apiClient.post("/login", {
+        await apiClient.post("/register", {
             username: this.username,
             password: this.password,
         });
 
-        const token = response.data.token;
-        localStorage.setItem("user-token", token);
-
-        this.$router.push("/home")
+        this.$router.push("/login")
       } catch (err){
-        this.error = err.response?.data?.message || "Login fail, please check your username and password"
+        this.error = err.response?.data?.message || "register fail, please check your username and password"
       } finally {
         this.isLoading = false;
       }
@@ -55,7 +67,7 @@ export default {
 </script>
 
 <style scoped>
-.login-container {
+.register-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -98,7 +110,7 @@ input{
   font-size: xx-large;
 }
 
-.btn{
+button{
   padding: 10px 20px;
   border: none;
   background-color: var(--highlight2-color);
@@ -107,14 +119,10 @@ input{
   border-radius: 20px;
   cursor: pointer;
   font-size: xx-large;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   transition: var(--fast-transition);
-  text-decoration: none;
 }
 
-.btn:hover{
+button:hover{
   background-color: var(--tips-color);
   color: black
 }

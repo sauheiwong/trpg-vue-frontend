@@ -3,8 +3,14 @@ import LoginView from '../views/loginView.vue';
 import ChatView from '../views/chatView.vue';
 import HomeView from '../views/homeView.vue';
 import SettingView from '@/views/settingView.vue';
+import RegisterView from '@/views/registerView.vue';
 
 const routes = [
+  {
+    path: '/register',
+    name: 'Register',
+    component: RegisterView,
+  },
   {
     path: '/',
     name: 'Login',
