@@ -4,11 +4,14 @@
       {{ isCollapsed ? '›' : '‹' }}
     </button>
     <div v-if="!isCollapsed" class="sidebar-content">
-      <router-link to="/" class="home-link">Home</router-link>
+      <router-link to="/home" class="home-link">Home</router-link>
       <button @click="newChat" class="new-chat-btn">+ New Chat</button>
       <h3>Chat History</h3>
       <ul>
-        <li v-for="conversation in conversations" :key="conversation.id" @click="selectConversation(conversation._id)">{{ conversation.title }}</li>
+        <li v-for="conversation in conversations" :key="conversation.id">
+          <p @click="selectConversation(conversation._id)">{{ conversation.title }}</p>
+          <button @click="deleteConversation(conversation._id)">🗑️</button>
+        </li>
       </ul>
       <button @click="logout" class="logout-btn">Logout</button>
     </div>
@@ -32,12 +35,14 @@ export default {
     toggleSidebar() {
       this.$emit('toggle');
     },
-    selectConversation(chatId){
-      console.log("select conversation id is: ", chatId)
-      this.$emit("select-chat", chatId)
+    selectConversation(conversationId){
+      this.$emit("select-chat", conversationId)
     },
     newChat(){
       this.$emit("new-chat");
+    },
+    deleteConversation(conversationId){
+      this.$emit("delete-chat", conversationId)
     },
     logout(){
       this.$emit("logout");
@@ -75,18 +80,19 @@ export default {
 }
 
 .logout-btn {
-  margin-top: auto; /* 將按鈕推到最下方 */
-  padding: 10px;
-  width: 100%;
   background-color: #f44336; /* 紅色 */
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s;
+  min-height: 100%;
+  width: 100%;
+  padding: 10px;
+  margin-top: auto; /* 將按鈕推到最下方 */
 }
 
-.logout-btn:hover {
+.logout-btn:hover ,.sidebar-content button:hover {
   background-color: #d32f2f;
 }
 
@@ -115,6 +121,25 @@ export default {
 }
 
 .sidebar-content li {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sidebar-content li button {
+  width: 20%;
+  padding: 10px;
+  background-color: #f44336; /* 紅色 */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-height: 100%;
+}
+
+.sidebar-content p {
   color: var(--text-color);
   background-color: var(--background-color);
   padding: 10px;
@@ -123,15 +148,25 @@ export default {
   transition: var(--fast-transition);
   display: flex;
   justify-content: center;
-  margin: 10px 0px;
+  margin: 0 5px 0 0;
   font-size: large;
+  width: calc(80% - 5px);
 }
 
-.sidebar-content li:hover {
+.sidebar-content p:hover {
   background-color: var(--highlight1-color);
 }
 
 .sidebar.collapsed {
+  .sidebar-content li {
+    display: block; /* Ensure vertical layout for collapsed state */
+    margin-bottom: 0; /* Remove bottom margin for collapsed state */
+  }
+
+  .sidebar-content button {
+    width: 100%; /* Full width buttons in collapsed state */
+    margin-top: 5px; /* Add some space between items */
+  }
   width: 60px;
 }
 

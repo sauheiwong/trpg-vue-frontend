@@ -6,7 +6,7 @@ import SettingView from '@/views/settingView.vue';
 
 const routes = [
   {
-    path: '/login',
+    path: '/',
     name: 'Login',
     component: LoginView,
   },
@@ -17,7 +17,7 @@ const routes = [
     meta: { requiresAuth: true }, // 標記此路由需要登入
   },
   {
-    path: '/',
+    path: '/home',
     name: 'Home',
     component: HomeView,
     meta: { requiresAuth: true }, // 標記此路由需要登入

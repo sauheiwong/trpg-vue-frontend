@@ -34,7 +34,6 @@ export default {
       this.error = "";
       this.isLoading = true;
       try{
-        console.log("login start")
         const response = await apiClient.post("/login", {
             username: this.username,
             password: this.password,
@@ -43,7 +42,7 @@ export default {
         const token = response.data.token;
         localStorage.setItem("user-token", token);
 
-        this.$router.push("/")
+        this.$router.push("/home")
       } catch (err){
         this.error = err.response?.data?.message || "Login fail, please check your username and password"
       } finally {

@@ -6,6 +6,7 @@
     @toggle="toggleSidebar"
     @new-chat="newChat" 
     @select-chat="getConversation" 
+    @delete-chat="deleteConversation"
     @logout="logout"
     />
     <div class="main-content">
@@ -54,9 +55,7 @@ export default {
     },
     async fetchConversations() {
       try{
-        console.log("fetch conversation start");
         const response = await apiClient.get("/chat");
-        console.log("response is: ", response);
         this.conversations = response.data.conversations;
       } catch (err){
         console.error("fetch conversation error is: ", err)
@@ -64,10 +63,8 @@ export default {
       }
     },
     async getConversation(conversationId){
-      console.log("get conversation id is: ", conversationId);
       try{
         const response = await apiClient.get(`/chat/${conversationId}`);
-        console.log("response.data is: ", response.data);
         this.title = response.data.title;
         this.messages = response.data.messages;
         this.conversationId = conversationId;
@@ -94,7 +91,6 @@ export default {
       })
 
       try{ 
-        console.log("fetch start");
 
         let response;
 
@@ -111,7 +107,7 @@ export default {
         });
         }
 
-        this.messages[this.messages.length - 1].content = response.data.modelMessage;
+        this.messages[this.messages.length - 1].content = response.data.message;
 
       } catch (err){
         this.messages[this.messages.length - 1].content = err.response?.data?.message || "fetch fail or server error"
@@ -120,7 +116,6 @@ export default {
     async updateTitle(newTitle) {
       if (this.isNewConversation) return;
       try{
-        console.log("conversation id is: ", this.conversationId)
         await apiClient.put(`/chat/${this.conversationId}`, {title: newTitle});
         const conversationInList = this.conversations.find(c => c._id === this.conversationId)
         if (conversationInList){
@@ -128,6 +123,21 @@ export default {
         }
       } catch (err){
         this.title = `Error⚠️: ${err}`;
+      }
+    },
+    async deleteConversation(conversationId) {
+      try{
+        await apiClient.delete(`/chat/${conversationId}`);
+        
+        this.conversations = this.conversations.filter(conversation => conversation._id !== conversationId)
+
+        if (this.conversationId === conversationId) {
+          this.newChat()
+        }
+      } catch (err){
+        console.error("Error deleting conversation:", err);
+        this.title = `Error⚠️: Could not delete conversation.`;
+        this.messages = [];
       }
     },
     logout() {
@@ -152,6 +162,10 @@ export default {
   display: flex;
   flex-direction: column;
   min-width: 0; /* 防止內容過寬時 flex item 溢出 */
+}
+
+a {
+  color: var(--text-color)
 }
 </style>
 
