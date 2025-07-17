@@ -1,3 +1,14 @@
+<script setup>
+import { onMounted } from 'vue';
+import { useHistoryStore } from '@/stores/historyStore';
+
+const historyStore = useHistoryStore();
+
+onMounted(() => {
+  historyStore.fetchConversations();
+})
+</script>
+
 <template>
   <div class="sidebar" :class="{ collapsed: isCollapsed }">
     <button @click="toggleSidebar" class="toggle-btn">
@@ -5,14 +16,24 @@
     </button>
     <div v-if="!isCollapsed" class="sidebar-content">
       <router-link to="/home" class="home-link">Home</router-link>
-      <button @click="newChat" class="new-chat-btn">+ New Chat</button>
+      <button @click="historyStore.newChat()" class="new-chat-btn">
+        + New Chat
+      </button>
       <h3>Chat History</h3>
-      <ul>
-        <li v-for="conversation in conversations" :key="conversation.id">
-          <p @click="selectConversation(conversation._id)">{{ conversation.title }}</p>
-          <button @click="deleteConversation(conversation._id)">🗑️</button>
-        </li>
-      </ul>
+      <div v-for="group in historyStore.groupedConversations" :key="group.label" class="conversation-group">
+        <h3 class="group-label">{{ group.label }}</h3>
+        <ul>
+          <li v-for="convo in group.conversations" :key="convo._id" class="conversation-item">
+            <p 
+            @click="historyStore.selectConveresation(convo._id)"
+            :class="{active: convo._id === historyStore.activeConversationId}"
+            >
+              {{ convo.title }}
+            </p>
+            <button>🗑️</button>
+          </li>
+        </ul>
+      </div>
       <button @click="logout" class="logout-btn">Logout</button>
     </div>
   </div>
@@ -26,10 +47,10 @@ export default {
       type: Boolean,
       required: true,
     },
-    conversations: {
-      type: Array,
-      required: true,
-    }
+    // conversations: {
+    //   type: Array,
+    //   required: true,
+    // }
   },
   methods: {
     toggleSidebar() {
@@ -115,6 +136,19 @@ export default {
   margin-bottom: 10px;
 }
 
+.conversation-group{
+  background-color: rgba(20, 20, 20);
+  padding: 5px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+
+.group-label{
+  color: var(--text-color);
+  font-size: x-large;
+  text-decoration: underline;
+}
+
 .sidebar-content ul {
   list-style: none;
   padding: 0;
@@ -125,6 +159,11 @@ export default {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+}
+
+.sidebar-content li.active {
+  background-color: var(--highlight2-color);
+  font-weight: bold;
 }
 
 .sidebar-content li button {
@@ -149,7 +188,7 @@ export default {
   display: flex;
   justify-content: center;
   margin: 0 5px 0 0;
-  font-size: large;
+  font-size: medium;
   width: calc(80% - 5px);
 }
 

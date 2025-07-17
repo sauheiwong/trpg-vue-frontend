@@ -1,19 +1,21 @@
+<script setup>
+import { useHistoryStore } from '@/stores/historyStore';
+
+const historyStore = useHistoryStore();
+</script>
+
 <template>
   <div id="chat-layout">
     <Sidebar 
     :is-collapsed="isSidebarCollapsed"
-    :conversations="conversations"
     @toggle="toggleSidebar"
-    @new-chat="newChat" 
-    @select-chat="getConversation" 
     @delete-chat="deleteConversation"
     @logout="logout"
     />
     <div class="main-content">
       <ChatInterface 
-      :title="title" 
-      :messages="messages" 
-      @send-message="sendMessage"
+      :title="historyStore.title" 
+      :messages="historyStore.messages" 
       @update-title="updateTitle"
       />
     </div>
@@ -33,85 +35,11 @@ export default {
   data() {
     return {
       isSidebarCollapsed: false,
-      title: "New Conversation",
-      messages: [],
-      isNewConversation: true,
-      conversationId: "",
-      conversations: [],
     };
-  },
-  created() {
-    this.fetchConversations();
   },
   methods: {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    },
-    newChat() {
-      this.title = "New chat";
-      this.messages = [];
-      this.isNewConversation = true;
-      this.conversationId = `new-${Date.now()}`
-    },
-    async fetchConversations() {
-      try{
-        const response = await apiClient.get("/chat");
-        this.conversations = response.data.conversations;
-      } catch (err){
-        console.error("fetch conversation error is: ", err)
-        this.conversations = [{title: "error", updatedAt: Date.now()}]
-      }
-    },
-    async getConversation(conversationId){
-      try{
-        const response = await apiClient.get(`/chat/${conversationId}`);
-        this.title = response.data.title;
-        this.messages = response.data.messages;
-        this.conversationId = conversationId;
-        this.isNewConversation = false;
-      } catch (err){
-        this.title = `Error⚠️: ${err}`;
-        this.messages = [];
-      }
-    },
-    async sendMessage(userMessage){
-      if (this.isNewConversation){
-        this.messages = []
-      }
-      this.messages.push({
-        id: Date.now(),
-        content: userMessage,
-        role: "user",
-      })
-
-      this.messages.push({
-        id: Date.now() + 1,
-        content: "loading...",
-        role: "assistant",
-      })
-
-      try{ 
-
-        let response;
-
-        if (this.isNewConversation){
-          response = await apiClient.post(`/test/chat/`, {
-          message: userMessage,
-        });
-          this.conversationId = response.data.conversationId;
-          this.isNewConversation = false;
-          await this.fetchConversations();
-        } else {
-          response = await apiClient.post(`/test/chat/${this.conversationId}`, {
-          message: userMessage,
-        });
-        }
-
-        this.messages[this.messages.length - 1].content = response.data.message;
-
-      } catch (err){
-        this.messages[this.messages.length - 1].content = err.response?.data?.message || "fetch fail or server error"
-      }
     },
     async updateTitle(newTitle) {
       if (this.isNewConversation) return;

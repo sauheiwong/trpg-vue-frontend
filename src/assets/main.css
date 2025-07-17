@@ -59,33 +59,3 @@
   max-width: 100%;
   align-self: center;
 }
-
-/* Input Area Styles */
-.input-area {
-  display: flex;
-}
-
-.input-area input {
-  flex-grow: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  margin-right: 10px;
-  background-color: var(--highlight1-color);
-  color: var(--text-color);
-}
-
-.input-area button {
-  padding: 10px 20px;
-  border: none;
-   background-color: var(--highlight2-color);
-  transition: 0.5s ease-in-out;
-  color: white;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.input-area button:hover {
-  background-color: var(--tips-color);
-  color: black
-}

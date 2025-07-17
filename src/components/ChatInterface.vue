@@ -1,102 +1,90 @@
+<script setup>
+import { ref, nextTick, watch } from "vue";
+import { useHistoryStore } from '@/stores/historyStore';
+import ChatMessage from "./ChatMessage.vue";
+
+const historyStore = useHistoryStore();
+
+const editingTitle = ref('');
+const titleInput = ref(null);
+
+const startEditing = () => {
+  editingTitle.value = historyStore.title;
+  historyStore.startEditTitle();
+  nextTick(() => {
+    titleInput.value?.focus();
+  })
+}
+
+const saveTitle = () => {
+  historyStore.editTitle(editingTitle.value);
+}
+
+const messageContainerRef = ref(null);
+
+watch(
+  () => historyStore.messages,
+  () => {
+    nextTick(() => {
+      const container = messageContainerRef.value;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    });
+  },
+  { deep: true }
+)
+
+</script>
+
 <template>
   <div class="chat-interface">
     <div class="chat-title-container">
-      <h1 v-if="!isEditingTitle" @click="startEditingTitle" class="editable-title">
-        {{ currentTitle }}
+      <h1 v-if="!historyStore.isEditingTitle" @click="startEditing" class="editable-title">
+        {{ historyStore.title }}
         <span class="edit-icon">✏️</span>
       </h1>
       <input
         v-else
         ref="titleInput"
-        v-model="currentTitle"
-        @blur="finishEditingTitle"
-        @keyup.enter="finishEditingTitle"
+        v-model="editingTitle"
+        @blur="saveTitle"
+        @keyup.enter="saveTitle"
         class="title-input"
       />
     </div>
-    <div class="messages-container">
+    <div class="messages-container" ref="messageContainerRef">
       <ChatMessage
-        v-for="message in messages"
-        :key="message.id"
+        v-for="message in historyStore.messages"
+        :key="message._id"
         :message="message"
       />
     </div>
     <div class="input-area">
-      <input type="text" v-model="userMessage" @keyup.enter="sendMessage" placeholder="Enter your message" />
-      <button @click="sendMessage">Send</button>
+      <input type="text" v-model="historyStore.userMessage" @keyup.enter="historyStore.sendMessage" placeholder="Enter your message" />
+      <button @click="historyStore.sendMessage()">Send</button>
     </div>
   </div>
 </template>
 
-<script>
-import ChatMessage from './ChatMessage.vue';
-
-export default {
-  name: 'ChatInterface',
-  components: {
-    ChatMessage,
-  },
-  props: {
-    messages: {
-      type: Array,
-      required: true
-    },
-    title: {
-      type: String,
-      required: true,
-    }
-  },
-  data() {
-    return {
-      userMessage: "",
-      isEditingTitle: false,
-      currentTitle: this.title,
-    };
-  },
-  watch: {
-    title(newTitle) {
-      this.currentTitle = newTitle
-    }
-  },  
-  methods: {
-    sendMessage() {
-      if(!this.userMessage.trim()){
-        return;
-      }
-      this.$emit("send-message", this.userMessage)
-      this.userMessage = ""
-    },
-    startEditingTitle() {
-      this.isEditingTitle = true;
-      this.$nextTick(() => {
-        this.$refs.titleInput.focus();
-      })
-    },
-    finishEditingTitle() {
-      this.isEditingTitle = false;
-      const newTitle = this.currentTitle.trim();
-
-      if (!newTitle || newTitle === this.title) {
-        this.currentTitle = this.title;
-        return;
-      }
-
-      this.$emit("update-title", newTitle);
-    }
-  }
-};
-</script>
-
 <style scoped>
 
+.chat-interface {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .chat-title-container {
-  position: relative;
-  margin-bottom: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .editable-title {
   cursor: pointer;
   padding-right: 30px;
+  margin: 0;
+  font-size: 1.5rem;
 }
 
 .editable-title .edit-icon {
@@ -112,7 +100,7 @@ export default {
 }
 
 .title-input {
-  font-size: 2em;
+  font-size: 1.5em;
   font-weight: bold;
   border: none;
   border-bottom: 2px solid var(--highlight1-color);
@@ -124,6 +112,42 @@ export default {
 
 .title-input:focus {
   outline: none;
+}
+
+.input-area {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.input-area input {
+  background-color: var(--highlight1-color);
+  color: var(--text-color);
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 18px;
+  margin-right: 1rem;
+}
+
+.input-area input:focus {
+  outline: none;
+}
+
+.input-area button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: var(--highlight2-color);
+  transition: 0.5s ease-in-out;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.input-area button:hover {
+  background-color: var(--tips-color);
+  color: black
 }
 
 </style>
