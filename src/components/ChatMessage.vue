@@ -26,7 +26,7 @@ export default {
   computed: {
     renderedContent() {
       if (this.message.content === "loading...") {
-        return '<div class="loading-dots"><div></div><div></div><div></div></div>'
+        return '<div class="loading-dots"><div>loading...</div></div>'
       }
       const rawHtml = marked(this.message.content, { gfm: true, breaks: true });
       const sanitizedHtml = DOMPurify.sanitize(rawHtml);

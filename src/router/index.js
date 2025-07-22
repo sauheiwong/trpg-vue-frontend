@@ -4,6 +4,7 @@ import ChatView from '../views/chatView.vue';
 import HomeView from '../views/homeView.vue';
 import SettingView from '@/views/settingView.vue';
 import RegisterView from '@/views/registerView.vue';
+import GameListView from '@/views/gameListView.vue';
 
 const routes = [
   {
@@ -33,6 +34,12 @@ const routes = [
     name: 'Setting',
     component: SettingView,
     meta: { requiresAuth: true }, // 標記此路由需要登入
+  },
+  {
+    path: "/chat/history",
+    name: "GameList",
+    component: GameListView,
+    meta: { requiresAuth: true },
   },
   // 捕獲所有未匹配的路由並重定向到首頁
   {

@@ -14,8 +14,8 @@ export const useHistoryStore = defineStore("history", {
     actions: {
         async fetchGames() {
             try{
-                const response = await apiClient.get("/chat");
-                console.log(`the number of fetching games: ${response.data.games[0].updatedAt.slice(0,10)}`)
+                const response = await apiClient.get("/game");
+                console.log(`the number of fetching games: ${response.data.games.length}`)
                 this.games = response.data.games;
             } catch (err){
                 console.error("fetch game error is: ", err)
@@ -36,7 +36,7 @@ export const useHistoryStore = defineStore("history", {
             try{
                 this.activeGameId = gameId;
 
-                const response = await apiClient.get(`/chat/${gameId}`);
+                const response = await apiClient.get(`/game/${gameId}`);
                 this.title = response.data.title;
                 this.messages = response.data.messages;
             } catch (err) {
@@ -125,7 +125,7 @@ export const useHistoryStore = defineStore("history", {
             this.isEditingTitle = false;
 
             try{
-                await apiClient.put(`/chat/${gameId}`, 
+                await apiClient.put(`/game/${gameId}`, 
                     {title: newTitle}
                 );
                 const gameInList = this.games.find(c => c._id === gameId)
@@ -145,7 +145,7 @@ export const useHistoryStore = defineStore("history", {
         },
         async deleteGame(gameId) {
             try{
-                await apiClient.delete(`/chat/${gameId}`);
+                await apiClient.delete(`/game/${gameId}`);
                 
                 this.games = this.games.filter(game => game._id !== gameId)
 

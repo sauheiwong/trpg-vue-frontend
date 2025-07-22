@@ -31,7 +31,7 @@ export default {
     this.checkGameStatus();
   },  
   methods: {
-    ...mapActions(useHistoryStore, ["newGame", "se"]),
+    ...mapActions(useHistoryStore, ["newGame", "selectGame"]),
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
@@ -40,6 +40,7 @@ export default {
 
       if (gameId) {
         console.log("load game with id: ", gameId);
+        await this.selectGame(gameId)
       } else {
         console.log("new game start")
         const newGameId = await this.newGame();

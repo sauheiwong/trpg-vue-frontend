@@ -10,6 +10,7 @@
             :to="option.to"
         />
         </div>
+        <div class="logout-container"><button @click="logout" class="logout-btn">Logout</button></div>
     </div>
   </div>
 </template>
@@ -22,11 +23,17 @@ export default {
     components: {
         Option,
     },
+    methods: {
+      logout() {
+        localStorage.removeItem("user-token");
+        this.$router.push("/login")
+    }
+    },
     data(){
         return {
             options: [
                 {id: "option-1", title: "New Chat", to: "/chat"},
-                {id: "option-2", title: "Chat History", to: "/"},
+                {id: "option-2", title: "Chat History", to: "/chat/history"},
                 {id: "option-3", title: "Setting", to: "/setting"},
             ]
         }
@@ -70,6 +77,19 @@ h2{
   justify-content: space-evenly;
   align-items: center;
   width: 100%;
+}
+
+.logout-btn {
+  background-color: #f44336; /* 紅色 */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-height: 100%;
+  width: 100%;
+  padding: 10px;
+  margin-top: auto; /* 將按鈕推到最下方 */
 }
 
 </style>

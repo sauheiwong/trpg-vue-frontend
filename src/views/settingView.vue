@@ -2,7 +2,10 @@
   <div id="chat-layout">
     <div class="main-content">
         <h2>Setting</h2>
-        <div class="setting-container">
+        <div v-if="isLoading" class="loading-container">
+            <p>Loading your setting...</p>
+        </div>
+        <div v-else class="setting-container">
             <SettingOption 
             v-for="option in options"
             :option="option"
@@ -11,16 +14,16 @@
             />
         </div>
         <div class="button-container">
-            <button @click="saveSetting">Save</button>
-            <router-link :to="'/'" >Back</router-link>
+            <button @click="saveSetting" :disabled="isLoading">Save</button>
+            <router-link :to="'/home'" >Back</router-link>
         </div>
-
     </div>
   </div>
 </template>
 
 <script>
 import SettingOption from '@/components/SettingOption.vue';
+import apiClient from '@/api';
 
 export default {
     name: "SettingView",
@@ -31,25 +34,50 @@ export default {
         this.buildInfor();
     },
     methods: {
-        buildInfor() {
-            this.options.forEach(option => {
-                this.infor[option.label] = option.value;
-            });
+        async buildInfor() {
+            await this.getUserInfor();
+            Object.entries(this.infor).forEach(([key, value], index) => {
+                this.options.push({
+                    id: index,
+                    value: value,
+                    label: key,
+                    placeholder: `your ${value}`,
+                    type: "text",
+                })
+            })
         },
         updateValue(label, value) {
             this.infor[label] = value;
         },
-        saveSetting(){
+        async getUserInfor() {
+            console.log("start get user infor");
+
+            try{
+                this.isLoading = true
+                const response = await apiClient.get("/user")
+                this.infor = response.data;
+            } catch (error) {
+                console.error(`Error ⚠️: fail to get user infor: ${error}`)
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async saveSetting(){
             console.log("this.infor is: ",this.infor)
+            try {
+                console.log("start save new settings.");
+                await apiClient.put("/user", this.infor);
+                this.$router.push("/home");
+            } catch (error) {
+                console.error(`Error ⚠️: fail to update user infor: ${error}`)
+            }
         }
     },
     data(){
         return {
-            options: [
-                {id: 1, value: "", type: "text", placeholder: "your name", label: "name"},
-                {id: 2, value: "", type: "text", placeholder: "your language", label: "language"},
-            ],
-            infor: {}
+            options: [],
+            infor: {},
+            isLoading: false,
         }
     },
 }
