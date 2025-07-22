@@ -9,15 +9,11 @@ const historyStore = useHistoryStore();
     <Sidebar 
     :is-collapsed="isSidebarCollapsed"
     @toggle="toggleSidebar"
-    @delete-chat="deleteConversation"
+    @delete-chat="deleteGame"
     @logout="logout"
     />
     <div class="main-content">
-      <ChatInterface 
-      :title="historyStore.title" 
-      :messages="historyStore.messages" 
-      @update-title="updateTitle"
-      />
+      <ChatInterface />
     </div>
   </div>
 </template>
@@ -41,30 +37,18 @@ export default {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
-    async updateTitle(newTitle) {
-      if (this.isNewConversation) return;
+    async deleteGame(gameId) {
       try{
-        await apiClient.put(`/chat/${this.conversationId}`, {title: newTitle});
-        const conversationInList = this.conversations.find(c => c._id === this.conversationId)
-        if (conversationInList){
-          conversationInList.title = newTitle
-        }
-      } catch (err){
-        this.title = `Error⚠️: ${err}`;
-      }
-    },
-    async deleteConversation(conversationId) {
-      try{
-        await apiClient.delete(`/chat/${conversationId}`);
+        await apiClient.delete(`/chat/${gameId}`);
         
-        this.conversations = this.conversations.filter(conversation => conversation._id !== conversationId)
+        this.games = this.games.filter(game => game._id !== gameId)
 
-        if (this.conversationId === conversationId) {
+        if (this.gameId === gameId) {
           this.newChat()
         }
       } catch (err){
-        console.error("Error deleting conversation:", err);
-        this.title = `Error⚠️: Could not delete conversation.`;
+        console.error("Error deleting game:", err);
+        this.title = `Error⚠️: Could not delete game.`;
         this.messages = [];
       }
     },

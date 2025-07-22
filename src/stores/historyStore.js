@@ -3,29 +3,29 @@ import apiClient from '../api';
 
 export const useHistoryStore = defineStore("history", {
     state: () => ({
-        conversations: [],
+        games: [],
         isLoading: false,
-        activeConversationId: "",
+        activeGameId: "",
         messages: [],
         title: "New Chat",
-        isNewConversation: true,
+        isNewGame: true,
         userMessage: "",
         isEditingTitle: false,
     }),
     actions: {
-        async fetchConversations() {
+        async fetchGames() {
             try{
                 const response = await apiClient.get("/chat");
-                console.log(`the number of fetching conversations: ${response.data.conversations[0].updatedAt.slice(0,10)}`)
-                this.conversations = response.data.conversations;
+                console.log(`the number of fetching games: ${response.data.games[0].updatedAt.slice(0,10)}`)
+                this.games = response.data.games;
             } catch (err){
-                console.error("fetch conversation error is: ", err)
-                this.conversations = [{_id: 1, title: "error", updatedAt: Date.now()}]
+                console.error("fetch game error is: ", err)
+                this.games = [{_id: 1, title: "error", updatedAt: Date.now()}]
             }
         },
-        async selectConveresation(conversationId) {
-            this.isNewConversation = false;
-            if (this.activeConversationId === conversationId) {
+        async selectConveresation(gameId) {
+            this.isNewGame = false;
+            if (this.activeGameId === gameId) {
                 return;
             }
 
@@ -36,9 +36,9 @@ export const useHistoryStore = defineStore("history", {
             }];
 
             try{
-                this.activeConversationId = conversationId;
+                this.activeGameId = gameId;
 
-                const response = await apiClient.get(`/chat/${conversationId}`);
+                const response = await apiClient.get(`/chat/${gameId}`);
                 this.title = response.data.title;
                 this.messages = response.data.messages;
             } catch (err) {
@@ -46,12 +46,12 @@ export const useHistoryStore = defineStore("history", {
                 this.messages = [{
                     _id: 1,
                     role: "system",
-                    content: 'Error ⚠️: Fail to fetch the informaiton of conversation',
+                    content: 'Error ⚠️: Fail to fetch the informaiton of game',
                 }]
             }
         },
         async sendMessage(){
-            if (this.isNewConversation){
+            if (this.isNewGame){
                 this.messages = [];
             }
 
@@ -74,15 +74,15 @@ export const useHistoryStore = defineStore("history", {
 
                 let response;
 
-                if (this.isNewConversation){
+                if (this.isNewGame){
                     response = await apiClient.post(`/test/chat/`, {
                     message: sendMessage,
                     });
-                    this.activeConversationId = response.data.conversationId;
-                    this.isNewConversation = false;
-                    await this.fetchConversations();
+                    this.activeGameId = response.data.gameId;
+                    this.isNewGame = false;
+                    await this.fetchGames();
                 } else {
-                    response = await apiClient.post(`/test/chat/${this.activeConversationId}`, {
+                    response = await apiClient.post(`/test/chat/${this.activeGameId}`, {
                     message: sendMessage,
                     });
                 }
@@ -97,35 +97,35 @@ export const useHistoryStore = defineStore("history", {
             }
         },
         newChat(){
-            this.isNewConversation = true;
+            this.isNewGame = true;
             this.messages = [];
             this.title = "New Chat";
         },
         startEditTitle() {
-            if (this.isNewConversation) {
+            if (this.isNewGame) {
                 return;
             }
             this.isEditingTitle = true;
         },
         async editTitle(newTitle){
             const trimmedTitle = newTitle.trim();
-            if (!trimmedTitle || trimmedTitle === this.title || this.isNewConversation) {
+            if (!trimmedTitle || trimmedTitle === this.title || this.isNewGame) {
                 this.isEditingTitle = false;
                 return;
             }
 
-            const conversationId = this.activeConversationId
+            const gameId = this.activeGameId
             const oldTitle = this.title;
             this.title = trimmedTitle;
             this.isEditingTitle = false;
 
             try{
-                await apiClient.put(`/chat/${conversationId}`, 
+                await apiClient.put(`/chat/${gameId}`, 
                     {title: newTitle}
                 );
-                const conversationInList = this.conversations.find(c => c._id === conversationId)
-                if (conversationInList){
-                    conversationInList.title = newTitle
+                const gameInList = this.games.find(c => c._id === gameId)
+                if (gameInList){
+                    gameInList.title = newTitle
                 }
             } catch (err){
                 console.error(`Error ⚠️: ${err}`)
@@ -137,10 +137,29 @@ export const useHistoryStore = defineStore("history", {
                 this.title = oldTitle;
             }
 
-        }
+        },
+        async deleteGame(gameId) {
+            try{
+                await apiClient.delete(`/chat/${gameId}`);
+                
+                this.games = this.games.filter(game => game._id !== gameId)
+
+                if (this.activeGameId === gameId) {
+                    this.newChat()
+                }
+            } catch (err){
+                console.error("Error deleting game:", err);
+                this.title = `Error⚠️`;
+                this.messages.push({
+                    _id: new Date(),
+                    role: "system",
+                    content: "Error ⚠️: Failed to deleting game"
+                })
+            }
+        },
     },
     getters: {
-        groupedConversations: (state) => {
+        groupedGames: (state) => {
             const groups = {
                 "Today": [],
                 "Yesterday": [],
@@ -155,7 +174,7 @@ export const useHistoryStore = defineStore("history", {
             const sevenDaysAgo = new Date(today);
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-            for (const convo of state.conversations) {
+            for (const convo of state.games) {
                 const convoDate = new Date(convo.updatedAt.slice(0,10));
                 console.log(`convoDate is: ${convoDate}`)
                 if (convoDate >= today) {
@@ -169,7 +188,7 @@ export const useHistoryStore = defineStore("history", {
                 }
             }
 
-            return Object.entries(groups).map(([label, conversations]) => ({ label, conversations})).filter(group => group.conversations.length > 0);
+            return Object.entries(groups).map(([label, games]) => ({ label, games})).filter(group => group.games.length > 0);
         }
     }
 })

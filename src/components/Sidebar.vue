@@ -5,7 +5,7 @@ import { useHistoryStore } from '@/stores/historyStore';
 const historyStore = useHistoryStore();
 
 onMounted(() => {
-  historyStore.fetchConversations();
+  historyStore.fetchGames();
 })
 </script>
 
@@ -20,17 +20,21 @@ onMounted(() => {
         + New Chat
       </button>
       <h3>Chat History</h3>
-      <div v-for="group in historyStore.groupedConversations" :key="group.label" class="conversation-group">
+      <div v-for="group in historyStore.groupedGames" :key="group.label" class="game-group">
         <h3 class="group-label">{{ group.label }}</h3>
         <ul>
-          <li v-for="convo in group.conversations" :key="convo._id" class="conversation-item">
+          <li v-for="convo in group.games" :key="convo._id" class="game-item">
             <p 
             @click="historyStore.selectConveresation(convo._id)"
-            :class="{active: convo._id === historyStore.activeConversationId}"
+            :class="{active: convo._id === historyStore.activeGameId}"
             >
               {{ convo.title }}
             </p>
-            <button>🗑️</button>
+            <button 
+            @click="historyStore.deleteGame(convo._id)"
+            >
+              🗑️
+            </button>
           </li>
         </ul>
       </div>
@@ -47,7 +51,7 @@ export default {
       type: Boolean,
       required: true,
     },
-    // conversations: {
+    // games: {
     //   type: Array,
     //   required: true,
     // }
@@ -56,14 +60,14 @@ export default {
     toggleSidebar() {
       this.$emit('toggle');
     },
-    selectConversation(conversationId){
-      this.$emit("select-chat", conversationId)
+    selectGame(gameId){
+      this.$emit("select-chat", gameId)
     },
     newChat(){
       this.$emit("new-chat");
     },
-    deleteConversation(conversationId){
-      this.$emit("delete-chat", conversationId)
+    deleteGame(gameId){
+      this.$emit("delete-chat", gameId)
     },
     logout(){
       this.$emit("logout");
@@ -136,7 +140,7 @@ export default {
   margin-bottom: 10px;
 }
 
-.conversation-group{
+.game-group{
   background-color: rgba(20, 20, 20);
   padding: 5px;
   margin-bottom: 5px;
