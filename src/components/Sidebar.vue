@@ -1,14 +1,3 @@
-<script setup>
-import { onMounted } from 'vue';
-import { useHistoryStore } from '@/stores/historyStore';
-
-const historyStore = useHistoryStore();
-
-onMounted(() => {
-  historyStore.fetchGames();
-})
-</script>
-
 <template>
   <div class="sidebar" :class="{ collapsed: isCollapsed }">
     <button @click="toggleSidebar" class="toggle-btn">
@@ -16,28 +5,6 @@ onMounted(() => {
     </button>
     <div v-if="!isCollapsed" class="sidebar-content">
       <router-link to="/home" class="home-link">Home</router-link>
-      <button @click="historyStore.newChat()" class="new-chat-btn">
-        + New Chat
-      </button>
-      <h3>Chat History</h3>
-      <div v-for="group in historyStore.groupedGames" :key="group.label" class="game-group">
-        <h3 class="group-label">{{ group.label }}</h3>
-        <ul>
-          <li v-for="convo in group.games" :key="convo._id" class="game-item">
-            <p 
-            @click="historyStore.selectConveresation(convo._id)"
-            :class="{active: convo._id === historyStore.activeGameId}"
-            >
-              {{ convo.title }}
-            </p>
-            <button 
-            @click="historyStore.deleteGame(convo._id)"
-            >
-              🗑️
-            </button>
-          </li>
-        </ul>
-      </div>
       <button @click="logout" class="logout-btn">Logout</button>
     </div>
   </div>
@@ -51,23 +18,10 @@ export default {
       type: Boolean,
       required: true,
     },
-    // games: {
-    //   type: Array,
-    //   required: true,
-    // }
   },
   methods: {
     toggleSidebar() {
       this.$emit('toggle');
-    },
-    selectGame(gameId){
-      this.$emit("select-chat", gameId)
-    },
-    newChat(){
-      this.$emit("new-chat");
-    },
-    deleteGame(gameId){
-      this.$emit("delete-chat", gameId)
     },
     logout(){
       this.$emit("logout");

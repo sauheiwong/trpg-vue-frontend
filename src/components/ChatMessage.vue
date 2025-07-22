@@ -2,7 +2,7 @@
   <div :class="['chat-message', message.role]">
     <div class="avatar" :class="message.role">
       <span v-if="message.role === 'user'">🧑</span>
-      <span v-else-if="message.role === 'assistant'">🤖</span>
+      <span v-else-if="message.role === 'model'">🤖</span>
       <span v-else>⚙️</span>
     </div>
     <div class="message-content-wrapper">

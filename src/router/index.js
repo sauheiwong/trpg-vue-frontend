@@ -17,10 +17,10 @@ const routes = [
     component: LoginView,
   },
   {
-    path: '/chat',
-    name: 'Chat',
+    path: "/chat/:gameId?",
+    name: "Chat",
     component: ChatView,
-    meta: { requiresAuth: true }, // 標記此路由需要登入
+    meta: { requiresAuth: true },
   },
   {
     path: '/home',

@@ -7,8 +7,7 @@ export const useHistoryStore = defineStore("history", {
         isLoading: false,
         activeGameId: "",
         messages: [],
-        title: "New Chat",
-        isNewGame: true,
+        title: "New Game",
         userMessage: "",
         isEditingTitle: false,
     }),
@@ -23,8 +22,7 @@ export const useHistoryStore = defineStore("history", {
                 this.games = [{_id: 1, title: "error", updatedAt: Date.now()}]
             }
         },
-        async selectConveresation(gameId) {
-            this.isNewGame = false;
+        async selectGame(gameId) {
             if (this.activeGameId === gameId) {
                 return;
             }
@@ -51,9 +49,6 @@ export const useHistoryStore = defineStore("history", {
             }
         },
         async sendMessage(){
-            if (this.isNewGame){
-                this.messages = [];
-            }
 
             const sendMessage = this.userMessage;
             this.userMessage = "";
@@ -67,27 +62,16 @@ export const useHistoryStore = defineStore("history", {
             this.messages.push({
                 _id: Date.now() + 1,
                 content: "loading...",
-                role: "assistant",
+                role: "model",
             })
 
             try{ 
 
-                let response;
-
-                if (this.isNewGame){
-                    response = await apiClient.post(`/test/chat/`, {
+                const response = await apiClient.post(`/gemini/${this.activeGameId}`, {
                     message: sendMessage,
-                    });
-                    this.activeGameId = response.data.gameId;
-                    this.isNewGame = false;
-                    await this.fetchGames();
-                } else {
-                    response = await apiClient.post(`/test/chat/${this.activeGameId}`, {
-                    message: sendMessage,
-                    });
-                }
+                });
 
-                console.log(`response is ${response}`)
+                console.log(`response is ${response}`);
 
                 this.messages[this.messages.length - 1].content = response.data.message;
 
@@ -96,20 +80,41 @@ export const useHistoryStore = defineStore("history", {
                 this.messages[this.messages.length - 1].content = err.response?.data?.message || "fetch fail or server error"
             }
         },
-        newChat(){
-            this.isNewGame = true;
+        async newGame(){
             this.messages = [];
-            this.title = "New Chat";
+            this.title = "New Game";
+
+            try{
+                const response = await apiClient.get(`/gemini`)
+
+                console.log(`response is ${response}`);
+
+                this.messages.push({
+                    _id: new Date(),
+                    content: response.data.message,
+                    role: "model"
+                })
+
+                this.activeGameId = response.data.gameId;
+
+                return this.activeGameId;
+
+            } catch (err) {
+                console.error(`Error ⚠️: fail to start a new game: ${err}`)
+                this.messages.push({
+                    _id: new Date(),
+                    content: "Error ⚠️: fail to start a new game",
+                    role: "system"
+                });
+                return null;
+            }
         },
         startEditTitle() {
-            if (this.isNewGame) {
-                return;
-            }
             this.isEditingTitle = true;
         },
         async editTitle(newTitle){
             const trimmedTitle = newTitle.trim();
-            if (!trimmedTitle || trimmedTitle === this.title || this.isNewGame) {
+            if (!trimmedTitle || trimmedTitle === this.title) {
                 this.isEditingTitle = false;
                 return;
             }

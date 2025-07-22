@@ -1,15 +1,8 @@
-<script setup>
-import { useHistoryStore } from '@/stores/historyStore';
-
-const historyStore = useHistoryStore();
-</script>
-
 <template>
   <div id="chat-layout">
     <Sidebar 
     :is-collapsed="isSidebarCollapsed"
     @toggle="toggleSidebar"
-    @delete-chat="deleteGame"
     @logout="logout"
     />
     <div class="main-content">
@@ -21,7 +14,8 @@ const historyStore = useHistoryStore();
 <script>
 import Sidebar from '../components/Sidebar.vue';
 import ChatInterface from '../components/ChatInterface.vue';
-import apiClient from '../api';
+import { useHistoryStore } from '@/stores/historyStore';
+import { mapActions } from 'pinia';
 
 export default {
   components: {
@@ -33,23 +27,29 @@ export default {
       isSidebarCollapsed: false,
     };
   },
+  created() {
+    this.checkGameStatus();
+  },  
   methods: {
+    ...mapActions(useHistoryStore, ["newGame", "se"]),
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
-    async deleteGame(gameId) {
-      try{
-        await apiClient.delete(`/chat/${gameId}`);
-        
-        this.games = this.games.filter(game => game._id !== gameId)
+    async checkGameStatus() {
+      const gameId = this.$route.params.gameId;
 
-        if (this.gameId === gameId) {
-          this.newChat()
+      if (gameId) {
+        console.log("load game with id: ", gameId);
+      } else {
+        console.log("new game start")
+        const newGameId = await this.newGame();
+
+        if (newGameId) {
+          this.$router.push({
+            name: "Chat",
+            params: { gameId: newGameId }
+          })
         }
-      } catch (err){
-        console.error("Error deleting game:", err);
-        this.title = `Error⚠️: Could not delete game.`;
-        this.messages = [];
       }
     },
     logout() {
