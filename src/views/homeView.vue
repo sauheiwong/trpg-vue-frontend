@@ -27,13 +27,13 @@ export default {
       logout() {
         localStorage.removeItem("user-token");
         this.$router.push("/login")
-    }
+      }
     },
     data(){
         return {
             options: [
-                {id: "option-1", title: "New Chat", to: "/chat"},
-                {id: "option-2", title: "Chat History", to: "/chat/history"},
+                {id: "option-1", title: "New Game", to: "/chat"},
+                {id: "option-2", title: "Game Recording", to: "/chat/history"},
                 {id: "option-3", title: "Setting", to: "/setting"},
             ]
         }

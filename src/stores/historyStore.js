@@ -59,6 +59,11 @@ export const useHistoryStore = defineStore("history", {
                 role: "user",
             })
 
+            if (sendMessage.trim().startsWith("/roll ")) {
+                this.handleRollCommand(sendMessage);
+                return;
+            }
+
             this.messages.push({
                 _id: Date.now() + 1,
                 content: "loading...",
@@ -79,6 +84,55 @@ export const useHistoryStore = defineStore("history", {
                 console.error(`Error ⚠️: ${err}`);
                 this.messages[this.messages.length - 1].content = err.response?.data?.message || "fetch fail or server error"
             }
+        },
+        async handleRollCommand(command) {
+
+            const diceString = command.substring("/roll ".length).trim();
+            if (!diceString) return;
+
+            this.messages.push({
+                _id: Date.now() + 1,
+                content: `Rolling ${diceString}...`,
+                role: "system",
+            })
+
+            try {
+                const response = await apiClient.post("/roll", {
+                    dice: diceString
+                })
+
+                const { message, total } = response.data;
+                const lastMessageIndex = this.messages.length - 1;
+                this.messages[lastMessageIndex].content = `🎲 ${diceString} ➔  [ ${total} ]\n( ${message} )`
+
+                try{ 
+
+                    this.messages.push({
+                        _id: Date.now() + 1,
+                        content: "loading...",
+                        role: "model",
+                    })
+
+                    const response = await apiClient.post(`/gemini/${this.activeGameId}`, {
+                        message: `[系統擲骰結果] ${diceString} ➔  [ ${total} ]\n( ${message} )`,
+                        role: "system"
+                    });
+
+                    console.log(`response is ${response}`);
+
+                    this.messages[this.messages.length - 1].content = response.data.message;
+
+                } catch (err){
+                    console.error(`Error ⚠️: ${err}`);
+                    this.messages[this.messages.length - 1].content = err.response?.data?.message || "fetch fail or server error"
+                }
+
+            } catch (error){
+                console.error(`Error ⚠️: fail to roll a dice: ${error}`)
+                const lastMessageIndex = this.messages.length - 1;
+                this.messages[lastMessageIndex].content = `Error ⚠️: fail to roll a dice`
+            }
+
         },
         async newGame(){
             this.messages = [];
