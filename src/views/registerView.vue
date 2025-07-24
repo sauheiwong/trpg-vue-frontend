@@ -55,7 +55,7 @@ export default {
             password: this.password,
         });
 
-        this.$router.push("/login")
+        this.$router.push("/")
       } catch (err){
         this.error = err.response?.data?.message || "register fail, please check your username and password"
       } finally {

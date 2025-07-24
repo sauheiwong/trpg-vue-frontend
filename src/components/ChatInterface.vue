@@ -61,7 +61,7 @@ watch(
       />
     </div>
     <div class="input-area">
-      <input type="text" v-model="historyStore.userMessage" @keyup.enter="historyStore.sendMessage" placeholder="Enter your message" />
+      <input type="text" v-model="historyStore.userMessage" @keyup.enter="historyStore.sendMessage" placeholder="Enter your message or Enter /roll 1d100 to roll a dice" />
       <button @click="historyStore.sendMessage()">Send</button>
     </div>
   </div>

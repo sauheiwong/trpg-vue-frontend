@@ -114,6 +114,7 @@ export const useHistoryStore = defineStore("history", {
                     })
 
                     const response = await apiClient.post(`/gemini/${this.activeGameId}`, {
+                        userMessage: command,
                         message: `[系統擲骰結果] ${diceString} ➔  [ ${total} ]\n( ${message} )`,
                         role: "system"
                     });
