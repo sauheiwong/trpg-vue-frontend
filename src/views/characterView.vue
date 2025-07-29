@@ -6,21 +6,23 @@
     @logout="logout"
     />
     <div class="main-content">
-      <ChatInterface />
+      <CharacterCreate />
+      
     </div>
   </div>
 </template>
 
 <script>
 import Sidebar from '../components/Sidebar.vue';
-import ChatInterface from '../components/ChatInterface.vue';
-import { useHistoryStore } from '@/stores/historyStore';
+import CharacterCreate from '@/components/CharacterCreate.vue';
+
+import { useCharacterStore } from '@/stores/characterStore';
 import { mapActions } from 'pinia';
 
 export default {
   components: {
     Sidebar,
-    ChatInterface,
+    CharacterCreate,
   },
   data() {
     return {
@@ -28,29 +30,26 @@ export default {
     };
   },
   created() {
-    this.checkGameStatus();
+    this.checkCharacterStatus();
   },  
   methods: {
-    ...mapActions(useHistoryStore, ["newGame", "selectGame"]),
+    ...mapActions(useCharacterStore, ["newChat", "selectChat"]),
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
-    async checkGameStatus() {
-      const gameId = this.$route.params.gameId;
+    async checkCharacterStatus() {
+      const chatId = this.$route.params.chatId;
 
-      if (gameId) {
-        console.log("load game with id: ", gameId);
-        await this.selectGame(gameId)
+      if (chatId) {
+        console.log("load character with id: ", chatId);
+        await this.selectChat(chatId)
       } else {
-        console.log("new game start")
-        const newGameId = await this.newGame();
-
-        if (newGameId) {
-          this.$router.push({
-            name: "Chat",
-            params: { gameId: newGameId }
+        console.log("new character start")
+        const newChatId = await this.newChat();
+        this.$router.push({
+            name: "CreateCharacterView",
+            params: { chatId: newChatId }
           })
-        }
       }
     },
     logout() {

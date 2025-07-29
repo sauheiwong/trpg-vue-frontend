@@ -2,7 +2,7 @@
     <tr>
         <td>{{ game.title }}</td>
         <td>{{ game.updatedAt.substring(0, 10) }}</td>
-        <td><router-link :to="`/chat/${game._id}`" class="link">Go</router-link></td>
+        <td><router-link :to="`/coc/${game._id}`" class="link">Go</router-link></td>
     </tr>
     
 </template>

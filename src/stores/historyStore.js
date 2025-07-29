@@ -5,11 +5,14 @@ export const useHistoryStore = defineStore("history", {
     state: () => ({
         games: [],
         isLoading: false,
+        isLoadingMore: false,
         activeGameId: "",
         messages: [],
         title: "New Game",
         userMessage: "",
         isEditingTitle: false,
+        currenPage: 1,
+        totalPages: 1,
     }),
     actions: {
         async fetchGames() {
@@ -35,10 +38,12 @@ export const useHistoryStore = defineStore("history", {
 
             try{
                 this.activeGameId = gameId;
+                this.currenPage = 1;
 
                 const response = await apiClient.get(`/game/${gameId}`);
                 this.title = response.data.title;
                 this.messages = response.data.messages;
+                this.totalPages = response.data.totalPages;
             } catch (err) {
                 console.error(`Error ⚠️: ${err}`)
                 this.messages = [{
@@ -48,6 +53,36 @@ export const useHistoryStore = defineStore("history", {
                 }]
             }
         },
+        // async fetchMoreMessages() {
+        //     if (this.isLoadingMore || this.currenPage >= this.totalPages) {
+        //         return;
+        //     }
+
+        //     this.isLoadingMore = true;
+        //     try {
+        //         const nextPage = this.currenPage + 1;
+        //         const response = await apiClient.get(`/game/${this.activeGameId}?page=${nextPage}`);
+
+        //         this.messages = [
+        //             {
+        //                 _id: 1,
+        //                 role: "system",
+        //                 content: "scroll\nup\nto\nget\nmore\nmessage\n🆙"
+        //             },
+        //             ...response.data.messages,
+        //             ...this.messages.slice(1)];
+        //         this.currenPage = nextPage;
+        //     } catch (err) {
+        //         console.error(`Error ⚠️: fail to fetch more message: ${err}`)
+        //         this.messages = [{
+        //             _id: 1,
+        //             role: "system",
+        //             content: 'Error ⚠️: Fail to fetch more message',
+        //         }, ...this.messages]
+        //     } finally {
+        //         this.isLoadingMore = false;
+        //     }
+        // },
         async sendMessage(){
 
             const sendMessage = this.userMessage;
@@ -115,7 +150,7 @@ export const useHistoryStore = defineStore("history", {
 
                     const response = await apiClient.post(`/gemini/${this.activeGameId}`, {
                         userMessage: command,
-                        message: `[系統擲骰結果] ${diceString} ➔  [ ${total} ]\n( ${message} )`,
+                        message: `[System Rolling Result] ${diceString} ➔  [ ${total} ]\n( ${message} )`,
                         role: "system"
                     });
 

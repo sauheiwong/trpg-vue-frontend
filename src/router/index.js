@@ -5,6 +5,9 @@ import HomeView from '../views/homeView.vue';
 import SettingView from '@/views/settingView.vue';
 import RegisterView from '@/views/registerView.vue';
 import GameListView from '@/views/gameListView.vue';
+import CharacterView from '@/views/characterView.vue';
+
+import GameTypeChooseView from '@/views/gameTypeChooseView.vue';
 
 const routes = [
   {
@@ -18,7 +21,13 @@ const routes = [
     component: LoginView,
   },
   {
-    path: "/chat/:gameId?",
+    path: '/game',
+    name: 'gameType',
+    component: GameTypeChooseView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/coc/:gameId?",
     name: "Chat",
     component: ChatView,
     meta: { requiresAuth: true },
@@ -36,9 +45,15 @@ const routes = [
     meta: { requiresAuth: true }, // 標記此路由需要登入
   },
   {
-    path: "/chat/history",
+    path: "/game/history",
     name: "GameList",
     component: GameListView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/characters/:chatId?",
+    name: "CreateCharacterView",
+    component: CharacterView,
     meta: { requiresAuth: true },
   },
   // 捕獲所有未匹配的路由並重定向到首頁

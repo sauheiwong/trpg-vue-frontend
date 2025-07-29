@@ -35,7 +35,7 @@ onMounted(() => {
             </table>
         </div>
         <div class="button-container">
-            <router-link :to="'/chat'" >New Game</router-link>
+            <router-link :to="'/game'" >New Game</router-link>
             <router-link :to="'/home'" >Back</router-link>
         </div>
     </div>

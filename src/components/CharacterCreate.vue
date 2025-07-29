@@ -1,29 +1,14 @@
 <script setup>
 import { ref, nextTick, watch } from "vue";
-import { useHistoryStore } from '@/stores/historyStore';
+import { useCharacterStore } from '@/stores/characterStore';
 import ChatMessage from "./ChatMessage.vue";
 
-const historyStore = useHistoryStore();
-
-const editingTitle = ref('');
-const titleInput = ref(null);
-
-const startEditing = () => {
-  editingTitle.value = historyStore.title;
-  historyStore.startEditTitle();
-  nextTick(() => {
-    titleInput.value?.focus();
-  })
-}
-
-const saveTitle = () => {
-  historyStore.editTitle(editingTitle.value);
-}
+const characterStore = useCharacterStore();
 
 const messageContainerRef = ref(null);
 
 watch(
-  () => historyStore.messages,
+  () => characterStore.messages,
   () => {
     nextTick(() => {
       const container = messageContainerRef.value;
@@ -40,29 +25,20 @@ watch(
 <template>
   <div class="chat-interface">
     <div class="chat-title-container">
-      <h1 v-if="!historyStore.isEditingTitle" @click="startEditing" class="editable-title">
-        {{ historyStore.title }}
-        <span class="edit-icon">✏️</span>
+      <h1 class="title">
+        {{ characterStore.title || "Create a new character" }}
       </h1>
-      <input
-        v-else
-        ref="titleInput"
-        v-model="editingTitle"
-        @blur="saveTitle"
-        @keyup.enter="saveTitle"
-        class="title-input"
-      />
     </div>
     <div class="messages-container" ref="messageContainerRef">
       <ChatMessage
-        v-for="message in historyStore.messages"
+        v-for="message in characterStore.messages"
         :key="message._id"
         :message="message"
       />
     </div>
     <div class="input-area">
-      <input type="text" v-model="historyStore.userMessage" @keyup.enter="historyStore.sendMessage" placeholder="Enter your message" />
-      <button @click="historyStore.sendMessage()">Send</button>
+      <input type="text" v-model="characterStore.userMessage" @keyup.enter="characterStore.sendMessage" placeholder="Enter your message" />
+      <button @click="characterStore.sendMessage()">Send</button>
     </div>
   </div>
 </template>
@@ -80,38 +56,10 @@ watch(
   border-bottom: 1px solid #e0e0e0;
 }
 
-.editable-title {
-  cursor: pointer;
+.title {
   padding-right: 30px;
   margin: 0;
   font-size: 1.5rem;
-}
-
-.editable-title .edit-icon {
-  display: inline-block;
-  opacity: 0.5;
-  transition: opacity 0.2s ease-in-out;
-  font-size: 0.8em;
-  margin-left: 8px;
-}
-
-.editable-title:hover .edit-icon{
-  opacity: 1;
-}
-
-.title-input {
-  font-size: 1.5em;
-  font-weight: bold;
-  border: none;
-  border-bottom: 2px solid var(--highlight1-color);
-  background-color: transparent;
-  color: var(--text-color);
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.title-input:focus {
-  outline: none;
 }
 
 .input-area {
