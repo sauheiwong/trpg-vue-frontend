@@ -61,7 +61,7 @@ watch(
       />
     </div>
     <div class="input-area">
-      <input type="text" v-model="historyStore.userMessage" @keyup.enter="historyStore.sendMessage" placeholder="Enter your message" />
+      <textarea type="text" v-model="historyStore.userMessage" @keydown.enter.exact.prevent="historyStore.sendMessage" placeholder="Enter your message"></textarea>
       <button @click="historyStore.sendMessage()">Send</button>
     </div>
   </div>
@@ -121,7 +121,7 @@ watch(
   border-top: 1px solid #e0e0e0;
 }
 
-.input-area input {
+.input-area textarea {
   background-color: var(--highlight1-color);
   color: var(--text-color);
   flex: 1;
@@ -131,7 +131,7 @@ watch(
   margin-right: 1rem;
 }
 
-.input-area input:focus {
+.input-area textarea:focus {
   outline: none;
 }
 

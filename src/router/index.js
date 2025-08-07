@@ -6,6 +6,7 @@ import SettingView from '@/views/settingView.vue';
 import RegisterView from '@/views/registerView.vue';
 import GameListView from '@/views/gameListView.vue';
 import CharacterView from '@/views/characterView.vue';
+import CharacterChooseView from '@/views/characterChooseView.vue';
 
 import GameTypeChooseView from '@/views/gameTypeChooseView.vue';
 
@@ -51,7 +52,13 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/characters/:chatId?",
+    path: "/coc/characters",
+    name: "COCCharactersList",
+    component: CharacterChooseView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/coc/characters/chat/:chatId?",
     name: "CreateCharacterView",
     component: CharacterView,
     meta: { requiresAuth: true },

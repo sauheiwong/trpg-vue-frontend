@@ -5,14 +5,19 @@
     </button>
     <div v-if="!isCollapsed" class="sidebar-content">
       <router-link to="/home" class="home-link">Home</router-link>
+      <CharacterDetail/>
       <button @click="logout" class="logout-btn">Logout</button>
     </div>
   </div>
 </template>
 
 <script>
+
+import CharacterDetail from './CharacterDetail.vue';
+
 export default {
   name: 'Sidebar',
+  components: { CharacterDetail },
   props: {
     isCollapsed: {
       type: Boolean,
@@ -35,23 +40,6 @@ export default {
 </script>
 
 <style scoped>
-
-.new-chat-btn{
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  background-color: var(--highlight2-color, #444);
-  color: var(--text-color);
-  border: 1px solid var(--highlight1-color);
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: var(--fast-transition);
-}
-
-.new-chat-btn:hover {
-  background-color: var(--highlight1-color);
-}
 
 .home-link{
   color: var(--text-color);
@@ -76,7 +64,7 @@ export default {
 }
 
 .sidebar {
-  width: 250px;
+  width: 512px;
   background-color: black;
   transition: width 0.3s ease;
   flex-shrink: 0; /* 防止側邊欄在視窗縮小時被壓縮 */

@@ -5,7 +5,6 @@ export const useCharacterStore = defineStore("character", {
     state: () => ({
         characters: [],
         isLoading: false,
-        activeCharacterId: "",
         activeChatId: "",
         messages: [],
         userMessage: "",
@@ -14,7 +13,7 @@ export const useCharacterStore = defineStore("character", {
     actions: {
         async fetchCharacters() {
             try{
-                const response = await apiClient.get("/characters");
+                const response = await apiClient.get("/coc/characters");
                 console.log(`the number of fetching characters: ${response.data.characters.length}`)
                 this.characters = response.data.characters;
             } catch (err){
@@ -41,7 +40,6 @@ export const useCharacterStore = defineStore("character", {
                 const response = await apiClient.get(`/chat/characters/${chatId}`);
                 console.log("response is: ", response)
                 this.messages = response.data.messages;
-                this.activeCharacterId = response.data.character._id;
                 this.activeChatId = chatId;
             } catch (err) {
                 console.error(`Error ⚠️: ${err}`)
@@ -83,7 +81,13 @@ export const useCharacterStore = defineStore("character", {
             }
         },
         async newChat(){
-            this.messages = [];
+            this.messages = [
+                {
+                    _id: new Date(),
+                    content: "loading...",
+                    role: "system"
+                }
+            ];
             this.title = "Create a new character";
 
             try{
@@ -97,18 +101,17 @@ export const useCharacterStore = defineStore("character", {
                     role: "model"
                 })
 
-                this.activeCharacterId = response.data.characterId;
                 this.activeChatId = response.data.chatId
 
-                return this.activeCharacterId;
+                return this.activeChatId;
 
             } catch (err) {
                 console.error(`Error ⚠️: fail to start a new character chat: ${err}`)
-                this.messages.push({
+                this.messages = [{
                     _id: new Date(),
                     content: "Error ⚠️: fail to start a new character chat",
                     role: "system"
-                });
+                }];
                 return null;
             }
         },

@@ -37,7 +37,7 @@ watch(
       />
     </div>
     <div class="input-area">
-      <input type="text" v-model="characterStore.userMessage" @keyup.enter="characterStore.sendMessage" placeholder="Enter your message" />
+      <textarea type="text" v-model="characterStore.userMessage" @keydown.enter.exact.prevent="characterStore.sendMessage" placeholder="Enter your message"></textarea>
       <button @click="characterStore.sendMessage()">Send</button>
     </div>
   </div>
@@ -69,7 +69,7 @@ watch(
   border-top: 1px solid #e0e0e0;
 }
 
-.input-area input {
+.input-area textarea {
   background-color: var(--highlight1-color);
   color: var(--text-color);
   flex: 1;
@@ -79,7 +79,7 @@ watch(
   margin-right: 1rem;
 }
 
-.input-area input:focus {
+.input-area textarea:focus {
   outline: none;
 }
 

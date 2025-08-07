@@ -13,6 +13,7 @@ export const useHistoryStore = defineStore("history", {
         isEditingTitle: false,
         currenPage: 1,
         totalPages: 1,
+        activeCharacter: null,
     }),
     actions: {
         async fetchGames() {
@@ -30,6 +31,8 @@ export const useHistoryStore = defineStore("history", {
                 return;
             }
 
+            this.isLoading = true;
+            this.activeCharacter = null;
             this.messages = [{
                 _id: 1,
                 role: "system",
@@ -43,7 +46,8 @@ export const useHistoryStore = defineStore("history", {
                 const response = await apiClient.get(`/game/${gameId}`);
                 this.title = response.data.title;
                 this.messages = response.data.messages;
-                this.totalPages = response.data.totalPages;
+                this.activeCharacter = response.data.character;
+                console.log("activeCharacter is:", this.activeCharacter);
             } catch (err) {
                 console.error(`Error ⚠️: ${err}`)
                 this.messages = [{
@@ -51,6 +55,8 @@ export const useHistoryStore = defineStore("history", {
                     role: "system",
                     content: 'Error ⚠️: Fail to fetch the informaiton of game',
                 }]
+            } finally {
+                this.isLoading = false;
             }
         },
         // async fetchMoreMessages() {
@@ -250,6 +256,21 @@ export const useHistoryStore = defineStore("history", {
                     role: "system",
                     content: "Error ⚠️: Failed to deleting game"
                 })
+            }
+        },
+        async getCharacterByGameId(){
+            try{
+                this.isLoading = true;
+
+                console.log("activeGameId is: ", this.activeGameId);
+
+                const response = await apiClient.get(`/game/character/${this.activeGameId}`);
+                this.activeCharacter = response.data.character;
+                console.log("activeCharacter is:", this.activeCharacter);
+            } catch (err) {
+                console.error(`Error ⚠️: ${err}`)
+            } finally {
+                this.isLoading = false;
             }
         },
     },
