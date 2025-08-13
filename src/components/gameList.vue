@@ -2,7 +2,7 @@
     <tr>
         <td>{{ game.title }}</td>
         <td>{{ game.updatedAt.substring(0, 10) }}</td>
-        <td><router-link :to="`/coc/${game._id}`" class="link">Go</router-link></td>
+        <td><router-link :to="`/${type}/chat/${game._id}`" class="link">Go</router-link></td>
     </tr>
     
 </template>
@@ -11,7 +11,8 @@
 export default {
     name: "gameList",
     props: {
-        game: {
+        type: { type: String },
+        game: { 
             type: Object,
         }
     },

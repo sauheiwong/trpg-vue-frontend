@@ -1,13 +1,13 @@
 <script setup>
 import { onMounted } from 'vue';
-import { useHistoryStore } from '@/stores/historyStore';
+import { useDNDStore } from '@/stores/DNDGameStore';
 
 import GameList from '@/components/gameList.vue';
 
-const historyStore = useHistoryStore();
+const DNDStore =useDNDStore();
 
 onMounted(() => {
-    historyStore.fetchGames()
+    DNDStore.fetchGames()
 })
 
 </script>
@@ -27,16 +27,16 @@ onMounted(() => {
                 </thead>
                 <tbody>
                     <GameList
-                    v-for="game in historyStore.games"
+                    v-for="game in DNDStore.games"
                     :game="game"
-                    type="coc"
+                    type="dnd"
                     :key="game._id"
                     />
                 </tbody>
             </table>
         </div>
         <div class="button-container">
-            <router-link :to="'/coc/chat'" >New Game</router-link>
+            <router-link :to="'/dnd/chat'" >New Game</router-link>
             <router-link :to="'/home'" >Back</router-link>
         </div>
     </div>

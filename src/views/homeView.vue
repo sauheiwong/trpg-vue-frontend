@@ -33,7 +33,7 @@ export default {
         return {
             options: [
                 {id: "option-1", title: "New Game", to: "/game"},
-                {id: "option-2", title: "Game Recording", to: "/game/history"},
+                {id: "option-2", title: "Game Recording", to: "/game"},
                 {id: "option-3", title: "Setting", to: "/setting"},
             ]
         }

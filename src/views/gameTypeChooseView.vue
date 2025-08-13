@@ -3,8 +3,8 @@
     <div class="container">
         <h4 class="title">Which TRPG are you goona play?</h4>
         <div class="link-container">
-            <router-link to="/coc/characters" class="option-link">Call of Cthulhu</router-link>
-            <router-link to="/chat2" class="option-link">Dungeons & Dragons</router-link>
+            <router-link to="/coc/game/history" class="option-link">Call of Cthulhu</router-link>
+            <router-link to="/dnd/game/history" class="option-link">Dungeons & Dragons</router-link>
         </div>
         <div class="link-container">
             <router-link to="/home" class="home-btn">Back</router-link>

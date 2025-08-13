@@ -5,10 +5,12 @@ import HomeView from '../views/homeView.vue';
 import SettingView from '@/views/settingView.vue';
 import RegisterView from '@/views/registerView.vue';
 import GameListView from '@/views/gameListView.vue';
+import DNDGameView from '@/views/DNDGameView.vue';
 import CharacterView from '@/views/characterView.vue';
 import CharacterChooseView from '@/views/characterChooseView.vue';
 
 import GameTypeChooseView from '@/views/gameTypeChooseView.vue';
+import DNDGameListView from '@/views/DNDGameListView.vue';
 
 const routes = [
   {
@@ -28,7 +30,7 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/coc/:gameId?",
+    path: "/coc/chat/:gameId?",
     name: "Chat",
     component: ChatView,
     meta: { requiresAuth: true },
@@ -46,9 +48,15 @@ const routes = [
     meta: { requiresAuth: true }, // 標記此路由需要登入
   },
   {
-    path: "/game/history",
+    path: "/coc/game/history",
     name: "GameList",
     component: GameListView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/dnd/game/history",
+    name: "DNDGameList",
+    component: DNDGameListView,
     meta: { requiresAuth: true },
   },
   {
@@ -61,6 +69,12 @@ const routes = [
     path: "/coc/characters/chat/:chatId?",
     name: "CreateCharacterView",
     component: CharacterView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/dnd/chat/:gameId?",
+    name: "DNDGameView",
+    component: DNDGameView,
     meta: { requiresAuth: true },
   },
   // 捕獲所有未匹配的路由並重定向到首頁
