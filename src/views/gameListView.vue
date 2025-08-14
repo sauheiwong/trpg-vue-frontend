@@ -1,14 +1,26 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useHistoryStore } from '@/stores/historyStore';
 
 import GameList from '@/components/gameList.vue';
 
 const historyStore = useHistoryStore();
+const route = useRoute();
 
-onMounted(() => {
-    historyStore.fetchGames()
-})
+// onMounted(() => {
+//     historyStore.fetchGames()
+// })
+
+watch(
+    () => route.path,
+    (newPath, oldPath) => {
+        if (newPath.includes("/coc/game/history")) {
+            historyStore.fetchGames()
+        }
+    },
+    { immediate: true },
+)
 
 </script>
 

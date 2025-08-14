@@ -1,14 +1,32 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useDNDStore } from '@/stores/DNDGameStore';
 
 import GameList from '@/components/gameList.vue';
 
 const DNDStore =useDNDStore();
+const route = useRoute();
 
-onMounted(() => {
-    DNDStore.fetchGames()
-})
+// onMounted(() => {
+//     DNDStore.fetchGames()
+// })
+
+console.log("route.path is:", route.path);
+
+
+watch(
+    () => route.path,
+    (newPath, oldPath) => {
+        console.log("old path is:", oldPath);
+        console.log("new path is:", newPath);
+        console.log("newPath === '/dnd/game/history' :", newPath === '/dnd/game/history')
+        if (newPath === "/dnd/game/history") {
+            DNDStore.fetchGames()
+        }
+    },
+    { immediate: true },
+)
 
 </script>
 

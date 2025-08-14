@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import apiClient from '../api';
 
-export const useDNDStore = defineStore("history", {
+export const useDNDStore = defineStore("DNDGame", {
     state: () => ({
         games: [],
         isLoading: false,
@@ -191,7 +191,7 @@ export const useDNDStore = defineStore("history", {
             this.isEditingTitle = false;
 
             try{
-                await apiClient.put(`/game/${gameId}`, 
+                await apiClient.put(`/dnd/game/${gameId}`, 
                     {title: newTitle}
                 );
                 const gameInList = this.games.find(c => c._id === gameId)
@@ -211,7 +211,7 @@ export const useDNDStore = defineStore("history", {
         },
         async deleteGame(gameId) {
             try{
-                await apiClient.delete(`/game/${gameId}`);
+                await apiClient.delete(`/dnd/game/${gameId}`);
                 
                 this.games = this.games.filter(game => game._id !== gameId)
 
@@ -234,7 +234,7 @@ export const useDNDStore = defineStore("history", {
 
                 console.log("activeGameId is: ", this.activeGameId);
 
-                const response = await apiClient.get(`/game/character/${this.activeGameId}`);
+                const response = await apiClient.get(`/dnd/game/character/${this.activeGameId}`);
                 this.activeCharacter = response.data.character;
                 console.log("activeCharacter is:", this.activeCharacter);
             } catch (err) {
