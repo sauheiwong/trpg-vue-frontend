@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import apiClient from '../api';
 
+import socket from "@/socket";
+
 export const useHistoryStore = defineStore("history", {
     state: () => ({
         games: [],
@@ -20,6 +22,42 @@ export const useHistoryStore = defineStore("history", {
         memoSaveStatus: "",
     }),
     actions: {
+        initailizeSocketListeners() {
+            console.log("Setting up socket listeners for history store ...");
+
+            socket.on("game:created", (data) => {
+                console.log("Event 'game:created' received: ", data);
+
+                this.messages = [{
+                    _id: new Date(),
+                    content: data.message,
+                    role: "model"
+                }];
+                this.activeGameId = data.gameId;
+                this.isLoading = false;
+
+                this.getAvailableCharacters("");
+            });
+
+            socket.on("game:creationError", (error) => {
+                console.error("Event 'game:creationError' received: ", error);
+
+                this.messages = [{
+                    _id: new Date(),
+                    content: `Error ⚠️: ${error.message || 'fail to start a new game'}`,
+                    role: "system"
+                }];
+                this.isLoading = false;
+            })
+
+            // other socket.on
+        },
+        cleanupSocketListeners() {
+            console.log("Cleaning up socket listeners for history store ...");
+            socket.off("game:created");
+            socket.off("game:creationError");
+            // other socket.off
+        },
         async fetchGames() {
             try{
                 const response = await apiClient.get("/game");
@@ -190,35 +228,18 @@ export const useHistoryStore = defineStore("history", {
 
         },
         async newGame(){
-            this.messages = [];
+            this.isLoading = true;
+            this.messages = [{
+                _id: Date.now(),
+                role: "model",
+                content: "starting a new advanture..."
+            }];
             this.title = "New Game";
-
-            try{
-                const response = await apiClient.get(`/gemini`)
-
-                console.log(`response is ${response}`);
-
-                this.messages.push({
-                    _id: new Date(),
-                    content: response.data.message,
-                    role: "model"
-                })
-
-                this.activeGameId = response.data.gameId;
-
-                this.getAvailableCharacters("");
-
-                return this.activeGameId;
-
-            } catch (err) {
-                console.error(`Error ⚠️: fail to start a new game: ${err}`)
-                this.messages.push({
-                    _id: new Date(),
-                    content: "Error ⚠️: fail to start a new game",
-                    role: "system"
-                });
-                return null;
-            }
+            this.activeCharacter = null;
+            this.activeGameId = "";
+            console.log("before send a start message to backend")
+            socket.emit("game:create");
+            console.log("after send a start message to backend")
         },
         startEditTitle() {
             this.isEditingTitle = true;

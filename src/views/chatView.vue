@@ -17,6 +17,7 @@ import Sidebar from '../components/Sidebar.vue';
 import ChatInterface from '../components/ChatInterface.vue';
 import { useHistoryStore } from '@/stores/historyStore';
 import { mapActions } from 'pinia';
+import socket from '@/socket';
 
 export default {
   components: {
@@ -29,10 +30,19 @@ export default {
     };
   },
   created() {
+    this.initailizeSocketListeners();
     this.checkGameStatus();
   },  
+  beforeUnmount() {
+    this.cleanupSocketListeners();
+  },
   methods: {
-    ...mapActions(useHistoryStore, ["newGame", "selectGame"]),
+    ...mapActions(useHistoryStore, [
+      "newGame", 
+      "selectGame",
+      "initailizeSocketListeners",
+      "cleanupSocketListeners",
+    ]),
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
@@ -44,18 +54,12 @@ export default {
         await this.selectGame(gameId)
       } else {
         console.log("new game start")
-        const newGameId = await this.newGame();
-
-        if (newGameId) {
-          this.$router.push({
-            name: "Chat",
-            params: { gameId: newGameId }
-          })
-        }
+        await this.newGame();
       }
     },
     logout() {
         localStorage.removeItem("user-token");
+        socket.disconnect();
         this.$router.push("/login")
     }
   }
