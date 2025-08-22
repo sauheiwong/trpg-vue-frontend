@@ -4,8 +4,9 @@
       {{ isCollapsed ? '›' : '‹' }}
     </button>
     <div v-if="!isCollapsed" class="sidebar-content">
-      <router-link to="/home" class="home-link">Home</router-link>
-      <CharacterDetail/>
+      <router-link to="/home" class="home-link">Home Docker Version</router-link>
+      <CharacterDetail v-if="isCOC"/>
+      <DNDCharacterDetail v-else/>
       <button @click="logout" class="logout-btn">Logout</button>
     </div>
   </div>
@@ -14,12 +15,20 @@
 <script>
 
 import CharacterDetail from './CharacterDetail.vue';
+import DNDCharacterDetail from './DNDCharacterDetail.vue';
 
 export default {
   name: 'Sidebar',
-  components: { CharacterDetail },
+  components: { 
+    CharacterDetail,
+    DNDCharacterDetail,
+   },
   props: {
     isCollapsed: {
+      type: Boolean,
+      required: true,
+    },
+    isCOC: {
       type: Boolean,
       required: true,
     },

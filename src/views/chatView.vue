@@ -4,6 +4,7 @@
     :is-collapsed="isSidebarCollapsed"
     @toggle="toggleSidebar"
     @logout="logout"
+    :isCOC="true"
     />
     <div class="main-content">
       <ChatInterface />

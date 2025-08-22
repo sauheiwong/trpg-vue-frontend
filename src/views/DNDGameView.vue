@@ -4,6 +4,7 @@
     :is-collapsed="isSidebarCollapsed"
     @toggle="toggleSidebar"
     @logout="logout"
+    :isCOC="false"
     />
     <div class="main-content">
       <DNDGameInterface />

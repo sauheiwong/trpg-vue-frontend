@@ -14,6 +14,10 @@ export const useHistoryStore = defineStore("history", {
         currenPage: 1,
         totalPages: 1,
         activeCharacter: null,
+        availableCharacters: [],
+        characters: [],
+        memo: "",
+        memoSaveStatus: "",
     }),
     actions: {
         async fetchGames() {
@@ -47,7 +51,12 @@ export const useHistoryStore = defineStore("history", {
                 this.title = response.data.title;
                 this.messages = response.data.messages;
                 this.activeCharacter = response.data.character;
+                this.memoSaveStatus = "";
+                this.memo = response.data.memo;
                 console.log("activeCharacter is:", this.activeCharacter);
+                if (!this.activeCharacter) {
+                    this.getAvailableCharacters("");
+                }
             } catch (err) {
                 console.error(`Error ⚠️: ${err}`)
                 this.messages = [{
@@ -121,6 +130,10 @@ export const useHistoryStore = defineStore("history", {
 
                 this.messages[this.messages.length - 1].content = response.data.message;
 
+                if (response.data.newCharacter) {
+                    this.activeCharacter = response.data.newCharacter;
+                }
+
             } catch (err){
                 console.error(`Error ⚠️: ${err}`);
                 this.messages[this.messages.length - 1].content = err.response?.data?.message || "fetch fail or server error"
@@ -192,6 +205,8 @@ export const useHistoryStore = defineStore("history", {
                 })
 
                 this.activeGameId = response.data.gameId;
+
+                this.getAvailableCharacters("");
 
                 return this.activeGameId;
 
@@ -265,6 +280,9 @@ export const useHistoryStore = defineStore("history", {
                 console.log("activeGameId is: ", this.activeGameId);
 
                 const response = await apiClient.get(`/game/character/${this.activeGameId}`);
+                if (response.data.character !== null) {
+                    return;
+                }
                 this.activeCharacter = response.data.character;
                 console.log("activeCharacter is:", this.activeCharacter);
             } catch (err) {
@@ -273,38 +291,43 @@ export const useHistoryStore = defineStore("history", {
                 this.isLoading = false;
             }
         },
-    },
-    getters: {
-        groupedGames: (state) => {
-            const groups = {
-                "Today": [],
-                "Yesterday": [],
-                "Last-7-days": [],
-                "Earlier": [],
-            };
+        async saveMemo(newMemoContent) {
+            const newMemoContentTrimed = newMemoContent.trim();
+            if (!this.activeGameId || newMemoContentTrimed === this.memo) {
+                console.log("not need to save memo");
+                return;
+            }
+            this.memoSaveStatus = "saving...";
 
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            const sevenDaysAgo = new Date(today);
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-            for (const convo of state.games) {
-                const convoDate = new Date(convo.updatedAt.slice(0,10));
-                console.log(`convoDate is: ${convoDate}`)
-                if (convoDate >= today) {
-                    groups.Today.push(convo);
-                } else if (convoDate >= yesterday) {
-                    groups.Yesterday.push(convo);
-                } else if (convoDate >= sevenDaysAgo) {
-                    groups["Last-7-days"].push(convo)
-                } else {
-                    groups.Earlier.push(convo)
-                }
+            try{
+                await apiClient.put(`/game/${this.activeGameId}`, {
+                    memo: newMemoContentTrimed
+                })
+                this.memo = newMemoContentTrimed;
+                this.memoSaveStatus = "save successful";
+            } catch {
+                console.error("fail to save memo: ", error);
+                this.memoSaveStatus = "fail to save memo";
             }
 
-            return Object.entries(groups).map(([label, games]) => ({ label, games})).filter(group => group.games.length > 0);
+            setTimeout(() => {
+                this.memoSaveStatus = ''
+            }, 3000);
+
+        },
+        async getAvailableCharacters(query) {
+            console.log("query is: ", query)
+            this.isLoading = true;
+
+            try{
+                const response = await apiClient.get(`/coc/characters?name=${query}`);
+                this.availableCharacters = response.data.characters;
+                console.log("number of available character is: ", this.availableCharacters.length)
+            } catch (error) {
+                console.error("fail to get available character: ", error);
+            } finally {
+                this.isLoading = false;
+            }
         }
-    }
+    },
 })

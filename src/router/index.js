@@ -6,8 +6,6 @@ import SettingView from '@/views/settingView.vue';
 import RegisterView from '@/views/registerView.vue';
 import GameListView from '@/views/gameListView.vue';
 import DNDGameView from '@/views/DNDGameView.vue';
-import CharacterView from '@/views/characterView.vue';
-import CharacterChooseView from '@/views/characterChooseView.vue';
 
 import GameTypeChooseView from '@/views/gameTypeChooseView.vue';
 import DNDGameListView from '@/views/DNDGameListView.vue';
@@ -57,18 +55,6 @@ const routes = [
     path: "/dnd/game/history",
     name: "DNDGameList",
     component: DNDGameListView,
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/coc/characters",
-    name: "COCCharactersList",
-    component: CharacterChooseView,
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/coc/characters/chat/:chatId?",
-    name: "CreateCharacterView",
-    component: CharacterView,
     meta: { requiresAuth: true },
   },
   {

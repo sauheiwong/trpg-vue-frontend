@@ -1,13 +1,12 @@
 <script setup>
-import { useHistoryStore } from '@/stores/historyStore';
+import { useDNDStore } from '@/stores/DNDGameStore';
 import { storeToRefs } from 'pinia';
 
-const historyStore = useHistoryStore();
+const DNDGameStore = useDNDStore();
 
-const { activeCharacter, isLoading } = storeToRefs(historyStore);
+const { activeCharacter, isLoading } = storeToRefs(DNDGameStore);
 
 import { ref } from 'vue';
-import COCCharacterList from './COCCharacterList.vue';
 
 const isDetailVisible = ref(false);
 const isMemoVisble = ref(false);
@@ -20,20 +19,10 @@ function toggleMemo() {
     isMemoVisble.value = !isMemoVisble.value;
 }
 
-const localMemo = ref(historyStore.memo);
+const localMemo = ref(DNDGameStore.memo);
 
 function handleSaveMemo() {
-    historyStore.saveMemo(localMemo.value);
-}
-
-const localCharacterQuery = ref("");
-
-function handleSearchCharacter() {
-    historyStore.getAvailableCharacters(localCharacterQuery.value);
-}
-
-function autoFill (character) {
-    historyStore.userMessage = `this is my character: ${JSON.stringify(character)}`
+    DNDGameStore.saveMemo(localMemo.value);
 }
 </script>
 
@@ -47,21 +36,20 @@ function autoFill (character) {
                 Character Detail <span>{{ isDetailVisible ? '[-]' : '[+]' }}</span>
             </h3>
             <div class="character-container section-content" v-if="isDetailVisible">
-                <img v-if="activeCharacter.img" :src="activeCharacter.img" alt="character image" class="character-img">
-                <p v-else>Character Avatar Feature coming soon</p>
+                <img :src="activeCharacter.img || '/images/characters/test.png'" alt="character image" class="character-img">
                 <h2>Name: {{ activeCharacter.name }}</h2>
                 <h4>Class: {{ activeCharacter.class }}</h4>
                 <p>Level: {{ activeCharacter.level }}</p>
                 <hr>
                 <div class="attributes-container">
                     <div v-for="(value, key, index) in activeCharacter.attributes" :key="index">
-                        <p>{{ key }}: {{ value }}</p>
+                        <p>{{ key }}: {{ value.score }} (+{{ value.modifier }})</p>
                     </div>
                 </div>
                 <hr>
                 <div class="skills-container">
                     <div v-for="(value, key, index) in activeCharacter.skills" :key="index" >
-                        <p>{{ key }}: {{ value }}</p>
+                        <p>{{ key }}</p>
                     </div>
                 </div>
             </div>
@@ -79,33 +67,14 @@ function autoFill (character) {
                 v-model="localMemo" 
                 @blur="handleSaveMemo"
                 ></textarea>
-                <small v-if="historyStore.memoSaveStatus">{{ historyStore.memoSaveStatus }}</small>
+                <small v-if="DNDGameStore.memoSaveStatus">{{ DNDGameStore.memoSaveStatus }}</small>
             </div>
         </div>
     </div>
     <div v-else class="no-character-container">
         <p>Character has not been created in this game.</p>
         <p>You can select these characters which were created.</p>
-        <input type="text" v-model="localCharacterQuery" @keydown.enter="handleSearchCharacter"></input>
-        <div v-if="historyStore.availableCharacters" class="character-list-container">
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Class</th>
-                </tr>
-                <COCCharacterList 
-                v-for="activeCharacter in historyStore.availableCharacters"
-                :key="activeCharacter._id"
-                :name="activeCharacter.name"
-                :characterClass="activeCharacter.class"
-                @click="autoFill(activeCharacter)"
-                />
-            </table>
-        </div>
-        <div v-else>
-            <p>No Available Character. Please create a new character with KP.</p>
-        </div>
-        <button v-on:click="historyStore.getCharacterByGameId">Get Character Information</button>
+        <button v-on:click="DNDGameStore.getCharacterByGameId">Get Character Information</button>
     </div>
 </template>
 
@@ -114,20 +83,6 @@ function autoFill (character) {
     padding: 20px;
     text-align: center;
     color: #888
-}
-
-.character-list-container {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-}
-
-table, th {
-    border: 1px solid white;
-}
-
-table {
-    width: 80%;
 }
 
 .collapsible-section {
