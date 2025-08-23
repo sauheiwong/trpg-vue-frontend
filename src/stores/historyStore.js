@@ -50,12 +50,58 @@ export const useHistoryStore = defineStore("history", {
                 this.isLoading = false;
             })
 
+            socket.on("message:received", (data) => {
+                const { message, role } = data;
+                console.log(`Event, 'message:received' received: ${message} with role: ${role}`);
+
+                const loadingMessageIndex = this.messages.findIndex(
+                    (msg) => msg.content === "loading..." && msg.role === "model"
+                )
+
+                if (loadingMessageIndex !== -1) {
+                    this.messages[loadingMessageIndex] = {
+                        _id: new Date(),
+                        role,
+                        content: message,
+                    }
+                } else {
+                    this.messages.push({
+                        _id: new Date(),
+                        role,
+                        content: message,
+                    })
+                }
+            })
+
+            socket.on("message:error", (data) => {
+                console.error("Error ⚠️: fail to send message to gemini or sever: ", data.error);
+
+                const loadingMessageIndex = this.messages.findIndex(
+                    (msg) => msg.content === "loading..." && msg.role === "model"
+                )
+
+                if (loadingMessageIndex !== -1) {
+                    this.messages[loadingMessageIndex] = {
+                        _id: new Date(),
+                        role: "system",
+                        content: "Error ⚠️: fail to send message to gemini or sever",
+                    }
+                } else {
+                    this.messages.push({
+                        _id: new Date(),
+                        role: "system",
+                        content: "Error ⚠️: fail to send message to gemini or sever",
+                    })
+                }
+            })
+
             // other socket.on
         },
         cleanupSocketListeners() {
             console.log("Cleaning up socket listeners for history store ...");
+            socket.disconnect();
             socket.off("game:created");
-            socket.off("game:creationError");
+            socket.off("game:creationError")
             // other socket.off
         },
         async fetchGames() {
@@ -91,7 +137,9 @@ export const useHistoryStore = defineStore("history", {
                 this.activeCharacter = response.data.character;
                 this.memoSaveStatus = "";
                 this.memo = response.data.memo;
-                console.log("activeCharacter is:", this.activeCharacter);
+
+                socket.emit("joinGame", this.activeGameId);
+                console.log(`socket emit joinGame with id: ${this.activeGameId }`)
                 if (!this.activeCharacter) {
                     this.getAvailableCharacters("");
                 }
@@ -147,35 +195,16 @@ export const useHistoryStore = defineStore("history", {
                 role: "user",
             })
 
-            if (sendMessage.trim().startsWith("/roll ")) {
-                this.handleRollCommand(sendMessage);
-                return;
-            }
-
             this.messages.push({
                 _id: Date.now() + 1,
                 content: "loading...",
                 role: "model",
             })
 
-            try{ 
-
-                const response = await apiClient.post(`/gemini/${this.activeGameId}`, {
-                    message: sendMessage,
-                });
-
-                console.log(`response is ${response}`);
-
-                this.messages[this.messages.length - 1].content = response.data.message;
-
-                if (response.data.newCharacter) {
-                    this.activeCharacter = response.data.newCharacter;
-                }
-
-            } catch (err){
-                console.error(`Error ⚠️: ${err}`);
-                this.messages[this.messages.length - 1].content = err.response?.data?.message || "fetch fail or server error"
-            }
+            socket.emit("sendMessage", {
+                gameId: this.activeGameId,
+                message: sendMessage,
+            })
         },
         async handleRollCommand(command) {
 
