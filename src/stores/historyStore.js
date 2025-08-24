@@ -3,6 +3,26 @@ import apiClient from '../api';
 
 import socket from "@/socket";
 
+const replaceLoadingMessage = ({ role, message }) => {
+    const loadingMessageIndex = this.messages.findIndex(
+        (msg) => msg.content === "loading..." && msg.role === "model"
+    )
+
+    if (loadingMessageIndex !== -1) {
+        this.messages[loadingMessageIndex] = {
+            _id: new Date(),
+            role,
+            content: message,
+        }
+    } else {
+        this.messages.push({
+            _id: new Date(),
+            role,
+            content: message,
+        })
+    }
+}
+
 export const useHistoryStore = defineStore("history", {
     state: () => ({
         games: [],
@@ -54,45 +74,17 @@ export const useHistoryStore = defineStore("history", {
                 const { message, role } = data;
                 console.log(`Event, 'message:received' received: ${message} with role: ${role}`);
 
-                const loadingMessageIndex = this.messages.findIndex(
-                    (msg) => msg.content === "loading..." && msg.role === "model"
-                )
+                replaceLoadingMessage({ role, message })
+            })
 
-                if (loadingMessageIndex !== -1) {
-                    this.messages[loadingMessageIndex] = {
-                        _id: new Date(),
-                        role,
-                        content: message,
-                    }
-                } else {
-                    this.messages.push({
-                        _id: new Date(),
-                        role,
-                        content: message,
-                    })
-                }
+            socket.on("systemMessage:received", (data) => {
+                const { message } = data;
+                replaceLoadingMessage({ role: "system", message })
             })
 
             socket.on("message:error", (data) => {
                 console.error("Error ⚠️: fail to send message to gemini or sever: ", data.error);
-
-                const loadingMessageIndex = this.messages.findIndex(
-                    (msg) => msg.content === "loading..." && msg.role === "model"
-                )
-
-                if (loadingMessageIndex !== -1) {
-                    this.messages[loadingMessageIndex] = {
-                        _id: new Date(),
-                        role: "system",
-                        content: "Error ⚠️: fail to send message to gemini or sever",
-                    }
-                } else {
-                    this.messages.push({
-                        _id: new Date(),
-                        role: "system",
-                        content: "Error ⚠️: fail to send message to gemini or sever",
-                    })
-                }
+                replaceLoadingMessage({ role: "system", message: "Error ⚠️: fail to send message to gemini or sever" })
             })
 
             // other socket.on
