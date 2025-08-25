@@ -53,6 +53,10 @@ function autoFill (character) {
                 <h4>Class: {{ activeCharacter.class }}</h4>
                 <p>Level: {{ activeCharacter.level }}</p>
                 <hr>
+                <h4>HP: {{ activeCharacter.hp.current }} / {{ activeCharacter.hp.max }}</h4>
+                <h4>MP: {{ activeCharacter.mp.current }} / {{ activeCharacter.mp.max }}</h4>
+                <h4>SAN: {{ activeCharacter.san }}</h4>
+                <hr>
                 <div class="attributes-container">
                     <div v-for="(value, key, index) in activeCharacter.attributes" :key="index">
                         <p>{{ key }}: {{ value }}</p>

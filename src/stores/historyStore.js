@@ -3,26 +3,6 @@ import apiClient from '../api';
 
 import socket from "@/socket";
 
-const replaceLoadingMessage = ({ role, message }) => {
-    const loadingMessageIndex = this.messages.findIndex(
-        (msg) => msg.content === "loading..." && msg.role === "model"
-    )
-
-    if (loadingMessageIndex !== -1) {
-        this.messages[loadingMessageIndex] = {
-            _id: new Date(),
-            role,
-            content: message,
-        }
-    } else {
-        this.messages.push({
-            _id: new Date(),
-            role,
-            content: message,
-        })
-    }
-}
-
 export const useHistoryStore = defineStore("history", {
     state: () => ({
         games: [],
@@ -74,12 +54,12 @@ export const useHistoryStore = defineStore("history", {
                 const { message, role } = data;
                 console.log(`Event, 'message:received' received: ${message} with role: ${role}`);
 
-                replaceLoadingMessage({ role, message })
+                this.replaceLoadingMessage({ role, message })
             })
 
             socket.on("systemMessage:received", (data) => {
                 const { message } = data;
-                replaceLoadingMessage({ role: "system", message })
+                this.replaceLoadingMessage({ role: "system", message })
             })
 
             socket.on("message:error", (data) => {
@@ -96,6 +76,26 @@ export const useHistoryStore = defineStore("history", {
             socket.off("game:creationError")
             // other socket.off
         },
+        replaceLoadingMessage({ role, message }) {
+            const loadingMessageIndex = this.messages.findIndex(
+                (msg) => msg.content === "loading..." && msg.role === "model"
+            )
+
+            if (loadingMessageIndex !== -1) {
+                this.messages[loadingMessageIndex] = {
+                    _id: new Date(),
+                    role,
+                    content: message,
+                }
+            } else {
+                this.messages.push({
+                    _id: new Date(),
+                    role,
+                    content: message,
+                })
+            }
+        }
+        ,
         async fetchGames() {
             try{
                 const response = await apiClient.get("/game");
