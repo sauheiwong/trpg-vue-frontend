@@ -64,7 +64,7 @@ export const useHistoryStore = defineStore("history", {
 
             socket.on("message:error", (data) => {
                 console.error("Error ⚠️: fail to send message to gemini or sever: ", data.error);
-                replaceLoadingMessage({ role: "system", message: "Error ⚠️: fail to send message to gemini or sever" })
+                this.replaceLoadingMessage({ role: "system", message: "Error ⚠️: fail to send message to gemini or sever" })
             })
 
             // other socket.on
