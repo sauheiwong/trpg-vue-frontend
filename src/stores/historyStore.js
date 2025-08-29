@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import apiClient from '../api';
 
+import router from '@/router/index.js'
+
 import socket from "@/socket";
 
 export const useHistoryStore = defineStore("history", {
@@ -37,6 +39,11 @@ export const useHistoryStore = defineStore("history", {
                 this.isLoading = false;
 
                 this.getAvailableCharacters("");
+
+                router.replace({ 
+                    name: 'Chat', // 建議使用路由名稱
+                    params: { gameId: data.gameId } 
+                });
             });
 
             socket.on("game:creationError", (error) => {

@@ -32,6 +32,7 @@ const routes = [
     name: "Chat",
     component: ChatView,
     meta: { requiresAuth: true },
+    props: true,
   },
   {
     path: '/home',
