@@ -76,6 +76,10 @@ export default {
   background-color: var(--highlight1-color);
 }
 
+img {
+  max-width: 512px;
+}
+
 :deep(.message-content pre) {
   background-color: #2d2d2d;
   color: #f8f8f2;
@@ -104,6 +108,17 @@ export default {
 
 :deep(.message-content p) {
   margin: 0.5rem 0;
+}
+
+/* 這是您需要添加的核心樣式 */
+.message-content :deep(img) {
+  display: block; /* 讓圖片自成一行，並可以設置 margin */
+  max-width: 512px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 8px;
+  background-color: #f0f0f0; /* 圖片載入前的佔位背景色 */
 }
 
 .loading-dots { display: flex; align-items: center; justify-content: center; height: 24px; }

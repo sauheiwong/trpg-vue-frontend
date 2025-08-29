@@ -62,6 +62,14 @@ export const useHistoryStore = defineStore("history", {
                 this.replaceLoadingMessage({ role: "system", message })
             })
 
+            socket.on("characterImage:updated", (data) => {
+                const { imageUrl } = data;
+                if (!this.activeCharacter) {
+                    return;
+                }
+                this.activeCharacter.imageUrl = imageUrl;
+            })
+
             socket.on("message:error", (data) => {
                 console.error("Error ⚠️: fail to send message to gemini or sever: ", data.error);
                 this.replaceLoadingMessage({ role: "system", message: "Error ⚠️: fail to send message to gemini or sever" })
@@ -129,6 +137,8 @@ export const useHistoryStore = defineStore("history", {
                 this.activeCharacter = response.data.character;
                 this.memoSaveStatus = "";
                 this.memo = response.data.memo;
+
+                console.log("activeCharacter is: ", this.activeCharacter);
 
                 socket.emit("joinGame", this.activeGameId);
                 console.log(`socket emit joinGame with id: ${this.activeGameId }`)

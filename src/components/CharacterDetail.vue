@@ -47,7 +47,7 @@ function autoFill (character) {
                 Character Detail <span>{{ isDetailVisible ? '[-]' : '[+]' }}</span>
             </h3>
             <div class="character-container section-content" v-if="isDetailVisible">
-                <img v-if="activeCharacter.img" :src="activeCharacter.img" alt="character image" class="character-img">
+                <img v-if="activeCharacter.imageUrl" :src="activeCharacter.imageUrl" alt="character image" class="character-img">
                 <p v-else>Character Avatar Feature coming soon</p>
                 <h2>Name: {{ activeCharacter.name }}</h2>
                 <h4>Class: {{ activeCharacter.class }}</h4>
