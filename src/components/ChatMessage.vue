@@ -76,6 +76,10 @@ export default {
   background-color: var(--highlight1-color);
 }
 
+.chat-message.system, .chat-message.model {
+  background-color: rgba(20, 20, 20, 0.9);
+}
+
 img {
   max-width: 512px;
 }

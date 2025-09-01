@@ -22,6 +22,7 @@ export const useHistoryStore = defineStore("history", {
         characters: [],
         memo: "",
         memoSaveStatus: "",
+        backgroundImageUrl: "",
     }),
     actions: {
         initailizeSocketListeners() {
@@ -75,6 +76,23 @@ export const useHistoryStore = defineStore("history", {
                     return;
                 }
                 this.activeCharacter.imageUrl = imageUrl;
+            })
+
+            socket.on("updateCharacterStats:received", (data) => {
+                const { characterId, hp, mp, san } = data;
+                if (characterId !== this.activeCharacter._id) {
+                    console.log("Wrong character id. Please check sever")
+                    return;
+                }
+
+                this.activeCharacter.hp.current = hp;
+                this.activeCharacter.mp.current = mp;
+                this.activeCharacter.san = san;
+
+            })
+
+            socket.on("backgroundImage:updated", (data) => {
+                this.backgroundImageUrl = data.imageUrl;
             })
 
             socket.on("message:error", (data) => {
@@ -144,6 +162,7 @@ export const useHistoryStore = defineStore("history", {
                 this.activeCharacter = response.data.character;
                 this.memoSaveStatus = "";
                 this.memo = response.data.memo;
+                this.backgroundImageUrl = response.data.game.currentBackgroundImage;
 
                 console.log("activeCharacter is: ", this.activeCharacter);
 

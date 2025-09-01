@@ -53,7 +53,7 @@ watch(
         class="title-input"
       />
     </div>
-    <div class="messages-container" ref="messageContainerRef">
+    <div class="messages-container" ref="messageContainerRef" :style="{ backgroundImage: `url(${historyStore.backgroundImageUrl || 'none'})` }">
       <ChatMessage
         v-for="message in historyStore.messages"
         :key="message._id"
@@ -95,7 +95,7 @@ watch(
   margin-left: 8px;
 }
 
-.editable-title:hover .edit-icon{
+.editable-title:hover .edit-icon {
   opacity: 1;
 }
 
@@ -147,7 +147,35 @@ watch(
 
 .input-area button:hover {
   background-color: var(--tips-color);
-  color: black
+  color: black;
+}
+
+.messages-container {
+  position: relative; /* 為偽元素定位 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 0.5s ease-in-out;
+  color: white; /* 白色文字 */
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8); /* 文字陰影 */
+}
+
+/* 遮罩層 */
+.messages-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* 半透明黑色遮罩，40% 不透明度 */
+  z-index: 1; /* 確保遮罩在背景圖上，但低於內容 */
+}
+
+/* 確保內容在遮罩層之上 */
+.messages-container > * {
+  position: relative;
+  z-index: 2;
 }
 
 </style>
