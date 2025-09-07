@@ -96,8 +96,8 @@ export const useHistoryStore = defineStore("history", {
             })
 
             socket.on("message:error", (data) => {
-                console.error("Error ⚠️: fail to send message to gemini or sever: ", data.error);
-                this.replaceLoadingMessage({ role: "system", message: "Error ⚠️: fail to send message to gemini or sever" })
+                console.error("Error ⚠️: ", data.error.message);
+                this.replaceLoadingMessage({ role: "system", message: `Error ⚠️: ${data.error.message}` })
             })
 
             // other socket.on
@@ -216,6 +216,10 @@ export const useHistoryStore = defineStore("history", {
 
             const sendMessage = this.userMessage;
             this.userMessage = "";
+
+            // if (!sendMessage || sendMessage.trim() === "") {
+            //     return;
+            // }
 
             this.messages.push({
                 _id: Date.now(),
