@@ -7,7 +7,6 @@ const historyStore = useHistoryStore();
 const { activeCharacter, isLoading } = storeToRefs(historyStore);
 
 import { ref } from 'vue';
-import COCCharacterList from './COCCharacterList.vue';
 
 const isDetailVisible = ref(false);
 const isMemoVisble = ref(false);
@@ -88,28 +87,9 @@ function autoFill (character) {
         </div>
     </div>
     <div v-else class="no-character-container">
-        <p>Character has not been created in this game.</p>
-        <p>You can select these characters which were created.</p>
-        <input type="text" v-model="localCharacterQuery" @keydown.enter="handleSearchCharacter"></input>
-        <div v-if="historyStore.availableCharacters" class="character-list-container">
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Class</th>
-                </tr>
-                <COCCharacterList 
-                v-for="activeCharacter in historyStore.availableCharacters"
-                :key="activeCharacter._id"
-                :name="activeCharacter.name"
-                :characterClass="activeCharacter.class"
-                @click="autoFill(activeCharacter)"
-                />
-            </table>
+        <div>
+            <p>You have not created your character. Please create a new character with KP.</p>
         </div>
-        <div v-else>
-            <p>No Available Character. Please create a new character with KP.</p>
-        </div>
-        <button v-on:click="historyStore.getCharacterByGameId">Get Character Information</button>
     </div>
 </template>
 
