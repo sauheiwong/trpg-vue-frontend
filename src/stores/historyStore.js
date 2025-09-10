@@ -216,17 +216,18 @@ export const useHistoryStore = defineStore("history", {
 
             const sendMessage = this.userMessage;
             this.userMessage = "";
-
-            // if (!sendMessage || sendMessage.trim() === "") {
-            //     return;
-            // }
-
+            
             this.messages.push({
                 _id: Date.now(),
                 content: sendMessage,
                 role: "user",
             })
 
+            if (sendMessage.startsWith("/roll")) {
+                this.handleRollCommand(sendMessage);
+                return;
+            }
+            
             this.messages.push({
                 _id: Date.now() + 1,
                 content: "loading...",
@@ -243,43 +244,11 @@ export const useHistoryStore = defineStore("history", {
             const diceString = command.substring("/roll ".length).trim();
             if (!diceString) return;
 
-            this.messages.push({
-                _id: Date.now() + 1,
-                content: `Rolling ${diceString}...`,
-                role: "system",
-            })
-
             try {
-                const response = await apiClient.post("/roll", {
-                    dice: diceString
+                await apiClient.post("/roll", {
+                    dice: diceString,
+                    gameId: this.activeGameId
                 })
-
-                const { message, total } = response.data;
-                const lastMessageIndex = this.messages.length - 1;
-                this.messages[lastMessageIndex].content = `🎲 ${diceString} ➔  [ ${total} ]\n( ${message} )`
-
-                try{ 
-
-                    this.messages.push({
-                        _id: Date.now() + 1,
-                        content: "loading...",
-                        role: "model",
-                    })
-
-                    const response = await apiClient.post(`/gemini/${this.activeGameId}`, {
-                        userMessage: command,
-                        message: `[System Rolling Result] ${diceString} ➔  [ ${total} ]\n( ${message} )`,
-                        role: "system"
-                    });
-
-                    console.log(`response is ${response}`);
-
-                    this.messages[this.messages.length - 1].content = response.data.message;
-
-                } catch (err){
-                    console.error(`Error ⚠️: ${err}`);
-                    this.messages[this.messages.length - 1].content = err.response?.data?.message || "fetch fail or server error"
-                }
 
             } catch (error){
                 console.error(`Error ⚠️: fail to roll a dice: ${error}`)
